@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivicNotice - public notice compliance support for CivicSuite</title>
+<style>
+body{margin:0;font-family:"Aptos","Segoe UI",sans-serif;color:#17202a;background:linear-gradient(135deg,#fff8ed,#eef8ff)}main,header,footer{width:min(1080px,calc(100% - 32px));margin:auto}header{padding:56px 0 24px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:#244f73;font-weight:800}h1{font:700 clamp(2.5rem,7vw,5.5rem)/.95 Georgia,serif;margin:.1em 0}.lede{font-size:1.25rem;line-height:1.6;max-width:820px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{background:rgba(255,255,255,.88);border:1px solid #dac7a4;border-radius:24px;padding:24px;box-shadow:0 18px 36px #26323b18}.badge{display:inline-block;background:#2f654c;color:white;padding:.5rem .8rem;border-radius:999px;font-weight:900}a{color:#244f73}:focus-visible{outline:4px solid #d8ad48;outline-offset:3px}@media(max-width:720px){.grid{grid-template-columns:1fr}header{padding-top:34px}}
+</style>
+</head>
+<body>
+<header>
+  <p class="eyebrow">CivicSuite / CivicNotice</p>
+  <h1>Public notices with fewer missed deadlines.</h1>
+  <p class="lede">CivicNotice v0.1.0 ships a foundation for notice registry, statutory deadline plans, publication-readiness checks, channel planning, notice-record exports, and an accessible sample UI.</p>
+  <p><span class="badge">Shipping v0.1.0</span></p>
+</header>
+<main>
+  <section class="grid">
+    <article class="card"><h2>What ships</h2><ul><li>Sample notice registry.</li><li>Statutory deadline plans.</li><li>Publication-readiness checklists.</li><li>Channel planning flags.</li><li>Notice and records export checklist.</li><li>Public sample UI at <code>/civicnotice</code>.</li></ul></article>
+    <article class="card"><h2>What does not ship</h2><p>CivicNotice does not decide legal sufficiency, publish official notices, provide legal advice, call live LLMs, write back to publication systems, or replace a notice system of record.</p></article>
+    <article class="card"><h2>Repository</h2><p><a href="https://github.com/CivicSuite/civicnotice">github.com/CivicSuite/civicnotice</a></p></article>
+    <article class="card"><h2>Dependency</h2><p>Pinned to <code>civiccore==0.2.0</code>. CivicCore remains dependency-only; it never imports from CivicNotice.</p></article>
+  </section>
+</main>
+<footer><p>Apache 2.0 code. CC BY 4.0 docs. Run locally by the city.</p></footer>
+</body>
+</html>
