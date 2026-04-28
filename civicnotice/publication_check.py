@@ -1,4 +1,4 @@
-"""Publication-readiness checks for CivicNotice v0.1.0."""
+"""Publication-readiness checks for CivicNotice v0.1.1."""
 
 from __future__ import annotations
 
