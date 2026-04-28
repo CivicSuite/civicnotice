@@ -1,9 +1,9 @@
-# Milestone 0-7 Done - CivicNotice v0.1.0 Foundation
+# Milestone 0-7 Done - CivicNotice v0.1.1 Foundation Alignment
 
 ## Completed
 
 - Repository, documentation, governance, and release scaffolding.
-- FastAPI runtime foundation pinned to `civiccore==0.2.0`.
+- FastAPI runtime foundation pinned to `civiccore==0.3.0`.
 - notice registry, deadline tracking, publication readiness tracking, channel planning, and public-records export helpers.
 - Public sample UI at `/civicnotice`.
 - Browser QA screenshots for the public UI and docs landing page.

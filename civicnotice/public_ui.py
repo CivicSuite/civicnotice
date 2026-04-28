@@ -1,4 +1,4 @@
-"""Static public UI shell for CivicNotice v0.1.0."""
+"""Static public UI shell for CivicNotice v0.1.1."""
 
 from __future__ import annotations
 
@@ -15,22 +15,23 @@ def render_public_lookup_page() -> str:
 <style>
   :root { --ink:#17202a; --muted:#5c6470; --blue:#244f73; --green:#2f654c; --gold:#d8ad48; --line:#ccd5df; }
   * { box-sizing: border-box; }
+  html, body { max-width:100%; overflow-x:hidden; }
   body { margin:0; color:var(--ink); font-family:"Aptos","Segoe UI",sans-serif; background:linear-gradient(135deg,#fff8ed,#eef8ff); }
   .skip-link { position:absolute; left:1rem; top:-4rem; background:var(--ink); color:white; padding:.7rem 1rem; border-radius:999px; }
   .skip-link:focus { top:1rem; }
-  header, main, footer { width:min(1120px, calc(100% - 32px)); margin:0 auto; }
+  header, main, footer { width:100%; max-width:1120px; margin:0 auto; padding-left:16px; padding-right:16px; }
   header { padding:48px 0 24px; }
   .eyebrow { color:var(--blue); text-transform:uppercase; letter-spacing:.18em; font-weight:800; font-size:.78rem; }
-  h1 { max-width:980px; margin:0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2.5rem,7vw,5.4rem); line-height:.98; letter-spacing:-.05em; }
+  h1 { max-width:980px; margin:0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2.2rem,7vw,5.4rem); line-height:1.02; letter-spacing:-.04em; overflow-wrap:break-word; word-break:break-word; }
   .lede { max-width:840px; font-size:clamp(1.1rem,2.4vw,1.45rem); line-height:1.55; color:#31404a; }
   .badge { display:inline-flex; width:fit-content; padding:.45rem .75rem; border-radius:999px; background:var(--green); color:white; font-weight:900; }
-  .grid { display:grid; grid-template-columns:repeat(12,1fr); gap:18px; }
-  .card { grid-column:span 6; min-width:0; padding:24px; border:1px solid var(--line); border-radius:28px; background:rgba(255,255,255,.92); box-shadow:0 18px 40px rgba(35,43,50,.10); }
+  .grid { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:18px; min-width:0; }
+  .card { grid-column:span 6; min-width:0; max-width:100%; padding:24px; border:1px solid var(--line); border-radius:28px; background:rgba(255,255,255,.92); box-shadow:0 18px 40px rgba(35,43,50,.10); }
   .card.large { grid-column:span 12; }
   h2,h3 { font-family:Georgia,"Times New Roman",serif; letter-spacing:-.03em; }
   h2 { margin:0 0 14px; font-size:clamp(1.8rem,4vw,3rem); }
-  p, li { line-height:1.65; }
-  textarea, button { width:100%; border:1px solid #b9c6cc; border-radius:16px; padding:.85rem 1rem; font:inherit; }
+  p, li { line-height:1.65; overflow-wrap:anywhere; }
+  textarea, button { width:100%; max-width:100%; min-width:0; border:1px solid #b9c6cc; border-radius:16px; padding:.85rem 1rem; font:inherit; }
   textarea { background:#f7f8fb; color:var(--ink); }
   button { width:fit-content; min-width:190px; border:0; background:var(--blue); color:white; font-weight:900; cursor:default; }
   .result { margin-top:18px; padding:18px; border-left:6px solid var(--green); border-radius:18px; background:white; }
@@ -38,7 +39,7 @@ def render_public_lookup_page() -> str:
   .kicker { color:var(--muted); font-size:.86rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
   footer { padding:38px 0 56px; color:var(--muted); }
   :focus-visible { outline:4px solid var(--gold); outline-offset:3px; }
-  @media (max-width:760px) { header{padding-top:34px}.card{grid-column:span 12;padding:20px;border-radius:22px}button{width:100%} }
+  @media (max-width:760px) { header{padding-top:34px}h1{font-size:clamp(1.95rem,10vw,2.55rem)}.lede{font-size:1.02rem}.card{grid-column:span 12;padding:20px;border-radius:22px}button{width:100%;white-space:normal} }
 </style>
 </head>
 <body>
@@ -47,7 +48,7 @@ def render_public_lookup_page() -> str:
   <p class="eyebrow">CivicSuite / CivicNotice public sample</p>
   <h1>Public notices with fewer missed deadlines.</h1>
   <p class="lede">CivicNotice demonstrates notice administration support: registry stubs, deadline plans, publication-readiness checks, channel planning, and proof-preserving records exports without publishing official notice.</p>
-  <p><span class="badge">v0.1.0 notice compliance foundation</span></p>
+  <p><span class="badge">v0.1.1 notice compliance foundation</span></p>
 </header>
 <main id="main" tabindex="-1">
   <section class="grid" aria-labelledby="lookup-title">

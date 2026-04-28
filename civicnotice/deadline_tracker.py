@@ -1,4 +1,4 @@
-"""Publication deadline helpers for CivicNotice v0.1.0."""
+"""Publication deadline helpers for CivicNotice v0.1.1."""
 
 from __future__ import annotations
 
