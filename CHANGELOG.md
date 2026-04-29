@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [0.1.1] - 2026-04-28
 
+### Added
+
+- Optional SQLAlchemy-backed notice registry and deadline-plan records via `CIVICNOTICE_WORKPAPER_DB_URL`.
+- Notice registry and deadline-plan retrieval endpoints for persisted records.
+
 ### Changed
 
 - Dependency-alignment release: moved CivicNotice to `civiccore==0.3.0` while preserving the existing notice registry, deadline, publication-readiness, channel planning, records export, and public UI foundation.
