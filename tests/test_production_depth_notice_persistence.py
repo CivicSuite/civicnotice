@@ -21,7 +21,9 @@ def test_repository_persists_registry_and_deadline(tmp_path: Path) -> None:
     repository.engine.dispose()
     reloaded = NoticeWorkpaperRepository(db_url=db_url)
     assert reloaded.get_notice_record(record.record_id).owner == "Clerk"
-    assert reloaded.get_deadline_plan(plan.plan_id).staff_review_required is True
+    stored_plan = reloaded.get_deadline_plan(plan.plan_id)
+    assert stored_plan.staff_review_required is True
+    assert "official notice record" in stored_plan.disclaimer
     reloaded.engine.dispose()
     db_path.unlink()
 
@@ -42,6 +44,7 @@ def test_notice_persistence_api_round_trip(monkeypatch, tmp_path: Path) -> None:
     assert fetched_record.json()["notice_id"] == "N-1"
     assert fetched_plan.status_code == 200
     assert fetched_plan.json()["staff_review_required"] is True
+    assert "official notice record" in fetched_plan.json()["disclaimer"]
     db_path.unlink()
 
 

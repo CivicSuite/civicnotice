@@ -1,10 +1,11 @@
-"""Publication deadline helpers for CivicNotice v0.1.1."""
+"""Publication deadline helpers for CivicNotice v0.1.2."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date
 
+from civiccore.notifications import build_deadline_plan as build_civiccore_deadline_plan
 from civicnotice.notice_registry import DISCLAIMER
 
 
@@ -20,16 +21,14 @@ class DeadlinePlan:
 def build_deadline_plan(*, notice_type: str, event_date: date, lead_days: int = 10) -> DeadlinePlan:
     """Build deterministic publication reminders without declaring legal sufficiency."""
 
-    publish_by = event_date - timedelta(days=lead_days)
-    reminders = (
-        f"{publish_by - timedelta(days=14)}: confirm statutory authority and publication channel.",
-        f"{publish_by - timedelta(days=7)}: route draft copy for clerk/legal review.",
-        f"{publish_by}: publish or file proof of publication deadline.",
-        f"{event_date}: verify final notice packet before hearing/opening/action.",
+    shared_plan = build_civiccore_deadline_plan(
+        notice_type=notice_type,
+        event_date=event_date,
+        lead_days=lead_days,
     )
     return DeadlinePlan(
-        notice_type=notice_type.strip() or "general notice",
-        event_date=event_date,
-        reminders=reminders,
-        staff_review_required=True,
+        notice_type=shared_plan.notice_type,
+        event_date=shared_plan.event_date,
+        reminders=shared_plan.reminders,
+        staff_review_required=shared_plan.staff_review_required,
     )
