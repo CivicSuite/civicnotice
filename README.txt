@@ -3,13 +3,13 @@ CivicNotice
 
 CivicNotice is the CivicSuite module for public hearing notices, legal notices, bid notices, vacancy notices, statutory publication deadlines, publication-readiness review, channel planning, and notice-record export checklists.
 
-Current state: v0.1.1 notice compliance foundation release, aligned to civiccore==0.3.0. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample notice registry, statutory deadline plans, optional database-backed registry/deadline workpapers via CIVICNOTICE_WORKPAPER_DB_URL, publication-readiness checklists, channel-planning helpers, notice/records export checklist, and accessible public sample UI at /civicnotice.
+Current state: v0.1.2 notice compliance foundation release, aligned to the civiccore v0.9.0 release wheel. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample notice registry, CivicCore-backed statutory deadline plans, optional database-backed registry/deadline workpapers via CIVICNOTICE_WORKPAPER_DB_URL, publication-readiness checklists, channel-planning helpers, notice/records export checklist, and accessible public sample UI at /civicnotice.
 
 It does not ship legal sufficiency decisions, legal advice, live LLM calls, official notice publication, publication-system write-back, or notice system-of-record integrations.
 
 What CivicNotice does:
 - Create sample notice registry stubs.
-- Build statutory publication deadline reminder plans.
+- Build statutory publication deadline reminder plans using the shared CivicCore notice helper.
 - Assemble publication-readiness checklists for staff review.
 - Plan notice channels and accessibility-review needs.
 - Produce notice and records export checklists.

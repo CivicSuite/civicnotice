@@ -2,12 +2,12 @@
 
 CivicNotice is the CivicSuite module for public hearing notices, legal notices, bid notices, vacancy notices, statutory publication deadlines, publication-readiness review, channel planning, and notice-record export checklists.
 
-Current state: **v0.1.1 notice compliance foundation release**, aligned to `civiccore==0.3.0`. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample notice registry, statutory deadline plans, optional database-backed registry/deadline workpapers, publication-readiness checklists, channel-planning helpers, notice/records export checklist, and accessible public sample UI at `/civicnotice`. It does **not** ship legal sufficiency decisions, legal advice, live LLM calls, official notice publication, publication-system write-back, or notice system-of-record integrations.
+Current state: **v0.1.2 notice compliance foundation release**, aligned to the `civiccore v0.9.0` release wheel. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample notice registry, CivicCore-backed statutory deadline plans, optional database-backed registry/deadline workpapers, publication-readiness checklists, channel-planning helpers, notice/records export checklist, and accessible public sample UI at `/civicnotice`. It does **not** ship legal sufficiency decisions, legal advice, live LLM calls, official notice publication, publication-system write-back, or notice system-of-record integrations.
 
 ## What CivicNotice Does
 
 - Create sample notice registry stubs.
-- Build statutory publication deadline reminder plans.
+- Build statutory publication deadline reminder plans using the shared CivicCore notice helper.
 - Persist notice registry and deadline-plan workpapers when `CIVICNOTICE_WORKPAPER_DB_URL` is configured.
 - Assemble publication-readiness checklists for staff review.
 - Plan notice channels and accessibility-review needs.
@@ -19,7 +19,7 @@ Current state: **v0.1.1 notice compliance foundation release**, aligned to `civi
 - It does not decide legal sufficiency.
 - It does not publish official notices.
 - It does not provide legal advice.
-- It does not call live LLMs in v0.1.1.
+- It does not call live LLMs in v0.1.2.
 - It does not write back to publication systems.
 - It does not replace a notice system of record.
 

@@ -4,6 +4,14 @@ All notable changes to CivicNotice will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.2] - 2026-04-29
+
+### Changed
+
+- Moved CivicNotice to the `civiccore v0.9.0` release wheel.
+- Replaced the local deadline-calculation implementation with the shared CivicCore notice deadline helper while preserving CivicNotice's disclaimer-bearing API and persistence shape.
+- Updated verification gates, runtime metadata, landing-page copy, and release docs for the v0.1.2 release.
+
 ## [0.1.1] - 2026-04-28
 
 ### Added

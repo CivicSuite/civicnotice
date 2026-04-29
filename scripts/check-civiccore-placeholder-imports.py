@@ -11,7 +11,6 @@ PLACEHOLDERS = {
     "connectors",
     "exemptions",
     "ingest",
-    "notifications",
     "onboarding",
     "scaffold",
     "search",
@@ -32,7 +31,7 @@ def main() -> int:
             package = match.group(1)
             if package in PLACEHOLDERS:
                 failures.append(
-                    f"{path}: civiccore.{package} is a placeholder package in v0.3.0. "
+                    f"{path}: civiccore.{package} is a placeholder package in CivicCore. "
                     "See AGENTS.md section 3.1."
                 )
 

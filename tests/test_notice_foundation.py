@@ -35,6 +35,7 @@ def test_deadline_plan_builds_publication_reminders() -> None:
     assert len(result.reminders) == 4
     assert "publish or file proof" in result.reminders[2]
     assert result.staff_review_required is True
+    assert "official notice record" in result.disclaimer
 
 
 def test_publication_checklist_requires_proof() -> None:
@@ -111,6 +112,6 @@ def test_public_ui_route_is_accessible_and_honest() -> None:
     text = response.text
     assert '<a class="skip-link" href="#main">Skip to main content</a>' in text
     assert '<main id="main" tabindex="-1">' in text
-    assert "v0.1.1 notice compliance foundation" in text
+    assert "v0.1.2 notice compliance foundation" in text
     assert "does not determine legal sufficiency" in text
     assert "replace the notice system of record" in text

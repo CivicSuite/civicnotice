@@ -65,14 +65,14 @@ def root() -> dict[str, str]:
         "version": __version__,
         "status": "notice compliance foundation",
         "message": (
-            "CivicNotice package, API foundation, sample notice registry, deadline plans, "
+            "CivicNotice package, API foundation, sample notice registry, CivicCore-backed deadline plans, "
             "publication-readiness checklist, channel planning, records export checklist, optional "
             "database-backed registry/deadline workpapers, and public UI foundation are online; official "
             "legal sufficiency decisions, official publication, legal "
             "advice, live LLM calls, publication-system write-back, and notice system-of-record integrations "
             "are not implemented yet."
         ),
-        "next_step": "Post-v0.1.1 roadmap: statutory rule packs, CivicClerk/CivicProcure/CivicNotice handoffs, and publication proof queues",
+        "next_step": "Post-v0.1.2 roadmap: statutory rule packs, CivicClerk/CivicProcure/CivicNotice handoffs, and publication proof queues",
     }
 
 

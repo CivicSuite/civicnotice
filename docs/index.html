@@ -12,15 +12,15 @@ body{margin:0;font-family:"Aptos","Segoe UI",sans-serif;color:#17202a;background
 <header>
   <p class="eyebrow">CivicSuite / CivicNotice</p>
   <h1>Public notices with fewer missed deadlines.</h1>
-  <p class="lede">CivicNotice v0.1.1 ships a foundation for notice registry, statutory deadline plans, optional registry/deadline workpaper persistence, publication-readiness checks, channel planning, notice-record exports, an accessible sample UI, and <code>civiccore==0.3.0</code> alignment.</p>
-  <p><span class="badge">Shipping v0.1.1</span></p>
+  <p class="lede">CivicNotice v0.1.2 ships a foundation for notice registry, CivicCore-backed statutory deadline plans, optional registry/deadline workpaper persistence, publication-readiness checks, channel planning, notice-record exports, an accessible sample UI, and the <code>civiccore v0.9.0</code> release-wheel alignment.</p>
+  <p><span class="badge">Shipping v0.1.2</span></p>
 </header>
 <main>
   <section class="grid">
     <article class="card"><h2>What ships</h2><ul><li>Sample notice registry.</li><li>Statutory deadline plans.</li><li>Optional persistence with <code>CIVICNOTICE_WORKPAPER_DB_URL</code>.</li><li>Publication-readiness checklists.</li><li>Channel planning flags.</li><li>Notice and records export checklist.</li><li>Public sample UI at <code>/civicnotice</code>.</li></ul></article>
     <article class="card"><h2>What does not ship</h2><p>CivicNotice does not decide legal sufficiency, publish official notices, provide legal advice, call live LLMs, write back to publication systems, or replace a notice system of record.</p></article>
     <article class="card"><h2>Repository</h2><p><a href="https://github.com/CivicSuite/civicnotice">github.com/CivicSuite/civicnotice</a></p></article>
-    <article class="card"><h2>Dependency</h2><p>Pinned to <code>civiccore==0.3.0</code>. CivicCore remains dependency-only; it never imports from CivicNotice.</p></article>
+    <article class="card"><h2>Dependency</h2><p>Pinned to the <code>civiccore v0.9.0</code> release wheel. CivicCore now supplies the shared deadline-plan helper; it still never imports from CivicNotice.</p></article>
   </section>
 </main>
 <footer><p>Apache 2.0 code. CC BY 4.0 docs. Run locally by the city.</p></footer>
