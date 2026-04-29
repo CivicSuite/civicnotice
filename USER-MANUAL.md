@@ -2,7 +2,7 @@
 
 ## For Non-Technical Users
 
-CivicNotice helps city staff organize public hearing notices, legal notices, bid notices, vacancy notices, publication deadlines, channel planning notes, proof requirements, and export manifests. It can create a sample notice registry stub, build publication deadline reminders, assemble publication-readiness checklists, summarize channel planning, and assemble a notice/records export checklist.
+CivicNotice helps city staff organize public hearing notices, legal notices, bid notices, vacancy notices, publication deadlines, channel planning notes, proof requirements, and export manifests. It can create a sample notice registry stub, build publication deadline reminders, retrieve saved registry/deadline workpapers when IT enables persistence, assemble publication-readiness checklists, summarize channel planning, and assemble a notice/records export checklist.
 
 Current state: `0.1.1` notice compliance foundation release, aligned to `civiccore==0.3.0`. CivicNotice does not decide legal sufficiency, publish official notices, provide legal advice, call live LLMs, write back to publication systems, or update a notice system of record. Staff own every decision.
 
@@ -10,11 +10,15 @@ Current state: `0.1.1` notice compliance foundation release, aligned to `civicco
 
 CivicNotice is a FastAPI Python package pinned to `civiccore==0.3.0`. The current runtime exposes:
 
+Set `CIVICNOTICE_WORKPAPER_DB_URL` to enable SQLAlchemy-backed notice registry and deadline-plan records. Leave it unset for deterministic stateless operation.
+
 - `GET /`
 - `GET /health`
 - `GET /civicnotice`
 - `POST /api/v1/civicnotice/registry`
+- `GET /api/v1/civicnotice/registry/{record_id}`
 - `POST /api/v1/civicnotice/deadlines`
+- `GET /api/v1/civicnotice/deadlines/{plan_id}`
 - `POST /api/v1/civicnotice/publication-check`
 - `POST /api/v1/civicnotice/channels`
 - `POST /api/v1/civicnotice/export`
