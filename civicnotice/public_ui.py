@@ -1,4 +1,4 @@
-"""Static public UI shell for CivicNotice v0.1.2."""
+﻿"""Static public UI shell for CivicNotice v0.1.2."""
 
 from __future__ import annotations
 
@@ -72,3 +72,167 @@ def render_public_lookup_page() -> str:
 </body>
 </html>
 """
+
+
+def render_staff_page() -> str:
+    """Render the staff-facing CivicNotice work queue page."""
+
+    return """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivicNotice Staff Review</title>
+<style>
+  :root { --ink:#17202a; --muted:#5c6470; --blue:#244f73; --green:#2f654c; --gold:#d8ad48; --line:#ccd5df; --paper:#fbfdff; }
+  * { box-sizing:border-box; }
+  html, body { max-width:100%; overflow-x:hidden; }
+  body { margin:0; color:var(--ink); font-family:"Aptos","Segoe UI",sans-serif; background:#f3f8fb; }
+  main, header, footer { width:100%; max-width:980px; margin:0 auto; padding-left:16px; padding-right:16px; }
+  header { padding:42px 0 22px; }
+  .eyebrow { color:var(--blue); text-transform:uppercase; letter-spacing:.16em; font-weight:900; font-size:.78rem; }
+  h1 { margin:.2rem 0 .6rem; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2rem,6vw,4.2rem); line-height:1.04; overflow-wrap:anywhere; }
+  .lede { max-width:760px; color:#31404a; font-size:1.15rem; line-height:1.55; }
+  .panel { border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:20px; box-shadow:0 14px 32px rgba(35,43,50,.08); }
+  .stack { display:grid; gap:16px; }
+  label { display:grid; gap:6px; font-weight:900; }
+  input, textarea, button { width:100%; border:1px solid #b9c6cc; border-radius:8px; padding:.82rem 1rem; font:inherit; }
+  textarea { min-height:88px; resize:vertical; }
+  button { border:0; background:var(--blue); color:white; font-weight:900; cursor:pointer; }
+  button.secondary { background:var(--green); }
+  .result { padding:16px; border-left:5px solid var(--green); border-radius:8px; background:white; min-height:54px; }
+  .queue { display:grid; gap:10px; }
+  .queue article { border:1px solid var(--line); border-radius:8px; background:white; padding:14px; }
+  footer { padding:34px 16px 54px; color:var(--muted); }
+  :focus-visible { outline:4px solid var(--gold); outline-offset:3px; }
+  @media (max-width:720px) { header{padding-top:28px}.panel{padding:18px} }
+</style>
+</head>
+<body>
+<header>
+  <p class="eyebrow">CivicSuite / CivicNotice staff</p>
+  <h1>Notice review queue</h1>
+  <p class="lede">Create local notice registry records, deadline plans, and staff queue items before publication, legal sufficiency review, proof capture, or records export work.</p>
+</header>
+<main class="stack">
+  <section class="panel stack" aria-labelledby="intake-title">
+    <h2 id="intake-title">Notice review intake</h2>
+    <label>Staff API key<input id="staffKey" type="password" autocomplete="off"></label>
+    <label>Notice ID<input id="noticeId" value="NOTICE-001"></label>
+    <label>Notice type<input id="noticeType" value="public hearing"></label>
+    <label>Owner<input id="owner" value="Clerk"></label>
+    <label>Review reason<textarea id="reviewReason">Confirm statutory authority, lead time, publication channel, accessibility needs, and proof capture.</textarea></label>
+    <button id="saveNotice" type="button">Save notice and queue review</button>
+    <button class="secondary" id="createDeadline" type="button">Create deadline review</button>
+    <button class="secondary" id="loadQueue" type="button">Load review queue</button>
+    <div class="result" id="status" role="status" aria-live="polite">Ready.</div>
+  </section>
+  <section class="panel">
+    <h2>Open notice reviews</h2>
+    <div class="queue" id="queue"></div>
+  </section>
+</main>
+<footer><p>CivicNotice keeps notice work local. Staff remain responsible for legal sufficiency, publication, proof retention, and the official notice record.</p></footer>
+<script>
+(() => {
+  const keyInput = document.querySelector("#staffKey");
+  const noticeId = document.querySelector("#noticeId");
+  const noticeType = document.querySelector("#noticeType");
+  const owner = document.querySelector("#owner");
+  const reviewReason = document.querySelector("#reviewReason");
+  const status = document.querySelector("#status");
+  const queue = document.querySelector("#queue");
+
+  const headers = () => ({
+    "Content-Type": "application/json",
+    "X-CivicNotice-Role": "staff",
+    "X-CivicNotice-Staff-Key": keyInput.value.trim()
+  });
+
+  const setStatus = (message) => {
+    status.replaceChildren(document.createTextNode(message));
+  };
+
+  const renderQueue = (items) => {
+    queue.replaceChildren();
+    if (!items.length) {
+      queue.append(document.createTextNode("No open reviews."));
+      return;
+    }
+    for (const item of items) {
+      const article = document.createElement("article");
+      const title = document.createElement("strong");
+      title.textContent = item.title;
+      const meta = document.createElement("p");
+      meta.textContent = `${item.notice_id} Â· ${item.status} Â· ${item.reason}`;
+      article.append(title, meta);
+      queue.append(article);
+    }
+  };
+
+  document.querySelector("#saveNotice").addEventListener("click", async () => {
+    try {
+      const notice = await fetch("/api/v1/civicnotice/registry", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          notice_id: noticeId.value.trim(),
+          notice_type: noticeType.value.trim(),
+          owner: owner.value.trim()
+        })
+      });
+      const noticeJson = await notice.json();
+      if (!notice.ok) throw new Error(JSON.stringify(noticeJson));
+      const review = await fetch("/api/v1/civicnotice/staff/reviews", {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({
+          notice_id: noticeJson.notice_id,
+          title: `Notice review: ${noticeJson.notice_type}`,
+          reason: reviewReason.value.trim()
+        })
+      });
+      const reviewJson = await review.json();
+      if (!review.ok) throw new Error(JSON.stringify(reviewJson));
+      setStatus(`Queued ${reviewJson.review_id} for ${noticeJson.notice_id}.`);
+    } catch (error) {
+      setStatus(`Could not queue notice review: ${error.message}`);
+    }
+  });
+
+  document.querySelector("#createDeadline").addEventListener("click", async () => {
+    try {
+      const response = await fetch("/api/v1/civicnotice/deadlines", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          notice_type: noticeType.value.trim(),
+          event_date: "2026-05-20",
+          lead_days: 10
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(JSON.stringify(data));
+      setStatus(`Created deadline plan ${data.plan_id}.`);
+    } catch (error) {
+      setStatus(`Could not create deadline review: ${error.message}`);
+    }
+  });
+
+  document.querySelector("#loadQueue").addEventListener("click", async () => {
+    try {
+      const response = await fetch("/api/v1/civicnotice/staff/reviews", { headers: headers() });
+      const data = await response.json();
+      if (!response.ok) throw new Error(JSON.stringify(data));
+      renderQueue(data.items);
+      setStatus(`Loaded ${data.items.length} review item(s).`);
+    } catch (error) {
+      setStatus(`Could not load staff queue: ${error.message}`);
+    }
+  });
+})();
+</script>
+</body>
+</html>
+"""
+

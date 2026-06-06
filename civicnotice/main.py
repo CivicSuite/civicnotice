@@ -2,18 +2,23 @@
 
 from datetime import date
 import os
+from pathlib import Path
 
 from civiccore import __version__ as CIVICCORE_VERSION
-from fastapi import FastAPI, HTTPException
+from civiccore.auth import staff_key_gate
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from civicnotice import __version__
 from civicnotice.channel_plan import plan_notice_channels
-from civicnotice.deadline_tracker import build_deadline_plan
-from civicnotice.notice_registry import register_notice_stub
-from civicnotice.persistence import NoticeWorkpaperRepository, StoredDeadlinePlan, StoredNoticeRecord
-from civicnotice.public_ui import render_public_lookup_page
+from civicnotice.persistence import (
+    NoticeWorkpaperRepository,
+    StaffReviewQueueItem,
+    StoredDeadlinePlan,
+    StoredNoticeRecord,
+)
+from civicnotice.public_ui import render_public_lookup_page, render_staff_page
 from civicnotice.publication_check import build_publication_checklist
 from civicnotice.records_export import build_notice_records_export
 
@@ -26,12 +31,13 @@ app = FastAPI(
 
 _workpaper_repository: NoticeWorkpaperRepository | None = None
 _workpaper_db_url: str | None = None
+_require_staff_key = staff_key_gate("CIVICNOTICE_STAFF_API_KEY", "X-CivicNotice-Staff-Key")
 
 
 class NoticeRegistryRequest(BaseModel):
-    notice_id: str
-    notice_type: str
-    owner: str
+    notice_id: str = Field(..., min_length=1, max_length=160)
+    notice_type: str = Field(..., min_length=1, max_length=160)
+    owner: str = Field(..., min_length=1, max_length=160)
 
 
 class DeadlineRequest(BaseModel):
@@ -56,6 +62,12 @@ class RecordsExportRequest(BaseModel):
     format: str = "markdown"
 
 
+class StaffReviewCreateRequest(BaseModel):
+    notice_id: str = Field(..., min_length=1, max_length=160)
+    title: str = Field(..., min_length=1, max_length=500)
+    reason: str = Field(..., min_length=1, max_length=1000)
+
+
 @app.get("/")
 def root() -> dict[str, str]:
     """Return current product state without overstating unshipped behavior."""
@@ -66,13 +78,14 @@ def root() -> dict[str, str]:
         "status": "notice compliance foundation",
         "message": (
             "CivicNotice package, API foundation, sample notice registry, CivicCore-backed deadline plans, "
-            "publication-readiness checklist, channel planning, records export checklist, optional "
-            "database-backed registry/deadline workpapers, and public UI foundation are online; official "
+            "publication-readiness checklist, channel planning, records export checklist, local-first "
+            "database-backed registry/deadline workpapers, staff review queues, suite handoff contracts, "
+            "and public/staff UI foundations are online; official "
             "legal sufficiency decisions, official publication, legal "
             "advice, live LLM calls, publication-system write-back, and notice system-of-record integrations "
-            "are not implemented yet."
+            "are not implemented."
         ),
-        "next_step": "Post-v0.1.2 roadmap: statutory rule packs, CivicClerk/CivicProcure/CivicNotice handoffs, and publication proof queues",
+        "next_step": "Open /civicnotice/staff for notice registry intake, deadline review, and staff queue triage.",
     }
 
 
@@ -88,6 +101,16 @@ def health() -> dict[str, str]:
     }
 
 
+@app.get("/ready")
+def ready() -> dict[str, object]:
+    return _readiness_payload()
+
+
+@app.get("/api/v1/civicnotice/readiness")
+def readiness() -> dict[str, object]:
+    return _readiness_payload()
+
+
 @app.get("/civicnotice", response_class=HTMLResponse)
 def public_civicnotice_page() -> str:
     """Return the public sample notice compliance support UI."""
@@ -95,26 +118,67 @@ def public_civicnotice_page() -> str:
     return render_public_lookup_page()
 
 
+@app.get("/civicnotice/staff", response_class=HTMLResponse)
+def staff_civicnotice_page() -> str:
+    """Return the staff notice review queue UI."""
+
+    return render_staff_page()
+
+
+@app.get("/api/v1/civicnotice/integration-contracts")
+def integration_contracts() -> dict[str, object]:
+    """Return suite-visible integration contracts for installer and downstream checks."""
+
+    return {
+        "module": "civicnotice",
+        "version": __version__,
+        "contracts": [
+            {
+                "name": "civicnotice.notice_registry.v1",
+                "endpoint": "/api/v1/civicnotice/registry",
+                "method": "POST",
+                "boundary": "Creates notice registry records; it does not publish official notices.",
+            },
+            {
+                "name": "civicnotice.staff_review_queue.v1",
+                "endpoint": "/api/v1/civicnotice/staff/reviews",
+                "method": "GET",
+                "requires_staff_key": True,
+                "boundary": "Staff-only queue for notice, deadline, proof, and channel review.",
+            },
+            {
+                "name": "civicnotice.publication_packet.v1",
+                "endpoint": "/api/v1/civicnotice/publication-check",
+                "method": "POST",
+                "boundary": "Builds publication checklists; it does not determine legal sufficiency.",
+            },
+            {
+                "name": "civicnotice.records_export.v1",
+                "endpoint": "/api/v1/civicnotice/export",
+                "method": "POST",
+                "boundary": "Builds notice records export checklists; it does not publish or redact records.",
+            },
+        ],
+        "downstream_ready_for": [
+            "civicclerk agenda public notices",
+            "civicboards vacancy public notices",
+            "civicprocure bid notices",
+            "civicrecords-ai notice file retention",
+            "civiclegal legal sufficiency review",
+        ],
+    }
+
+
 @app.post("/api/v1/civicnotice/registry")
 def notice_registry(request: NoticeRegistryRequest) -> dict[str, object]:
-    if _workpaper_database_url() is not None:
-        return _stored_notice_response(_get_workpaper_repository().create_notice_record(
+    return _stored_notice_response(_get_workpaper_repository().create_notice_record(
             notice_id=request.notice_id,
             notice_type=request.notice_type,
             owner=request.owner,
-        ))
-    payload = register_notice_stub(
-        notice_id=request.notice_id,
-        notice_type=request.notice_type,
-        owner=request.owner,
-    ).__dict__
-    payload["record_id"] = None
-    return payload
+    ))
 
 @app.get("/api/v1/civicnotice/registry/{record_id}")
 def get_notice_registry(record_id: str) -> dict[str, object]:
-    if _workpaper_database_url() is None:
-        raise HTTPException(status_code=503, detail={"message":"CivicNotice workpaper persistence is not configured.","fix":"Set CIVICNOTICE_WORKPAPER_DB_URL to retrieve persisted notice registry records."})
     stored = _get_workpaper_repository().get_notice_record(record_id)
     if stored is None:
         raise HTTPException(status_code=404, detail={"message":"Notice registry record not found.","fix":"Use a record_id returned by POST /api/v1/civicnotice/registry."})
@@ -123,24 +187,14 @@ def get_notice_registry(record_id: str) -> dict[str, object]:
 
 @app.post("/api/v1/civicnotice/deadlines")
 def deadline_plan(request: DeadlineRequest) -> dict[str, object]:
-    if _workpaper_database_url() is not None:
-        return _stored_deadline_response(_get_workpaper_repository().create_deadline_plan(
+    return _stored_deadline_response(_get_workpaper_repository().create_deadline_plan(
             notice_type=request.notice_type,
             event_date=request.event_date,
             lead_days=request.lead_days,
-        ))
-    payload = build_deadline_plan(
-        notice_type=request.notice_type,
-        event_date=request.event_date,
-        lead_days=request.lead_days,
-    ).__dict__
-    payload["plan_id"] = None
-    return payload
+    ))
 
 @app.get("/api/v1/civicnotice/deadlines/{plan_id}")
 def get_deadline_plan(plan_id: str) -> dict[str, object]:
-    if _workpaper_database_url() is None:
-        raise HTTPException(status_code=503, detail={"message":"CivicNotice workpaper persistence is not configured.","fix":"Set CIVICNOTICE_WORKPAPER_DB_URL to retrieve persisted deadline plans."})
     stored = _get_workpaper_repository().get_deadline_plan(plan_id)
     if stored is None:
         raise HTTPException(status_code=404, detail={"message":"Deadline plan record not found.","fix":"Use a plan_id returned by POST /api/v1/civicnotice/deadlines."})
@@ -171,14 +225,50 @@ def records_export(request: RecordsExportRequest) -> dict[str, object]:
         format=request.format,
     ).__dict__
 
-def _workpaper_database_url() -> str | None:
-    return os.environ.get("CIVICNOTICE_WORKPAPER_DB_URL")
+
+@app.post("/api/v1/civicnotice/staff/reviews")
+def create_staff_review(
+    request: StaffReviewCreateRequest,
+    _staff_principal: object = Depends(_require_staff_key),
+) -> dict[str, object]:
+    item = _get_workpaper_repository().create_staff_review_queue_item(
+        notice_id=request.notice_id,
+        title=request.title,
+        reason=request.reason,
+        created_by="staff",
+    )
+    return _staff_review_payload(item)
+
+
+@app.get("/api/v1/civicnotice/staff/reviews")
+def list_staff_reviews(
+    status: str | None = None,
+    _staff_principal: object = Depends(_require_staff_key),
+) -> dict[str, object]:
+    return {
+        "visibility": "staff_only",
+        "items": [
+            _staff_review_payload(item)
+            for item in _get_workpaper_repository().list_staff_review_queue_items(status=status)
+        ],
+    }
+
+
+def _workpaper_database_url() -> str:
+    configured = os.environ.get("CIVICNOTICE_WORKPAPER_DB_URL")
+    if configured:
+        return configured
+    data_dir = Path(os.environ.get("CIVICNOTICE_DATA_DIR", Path.cwd() / "data")).resolve()
+    data_dir.mkdir(parents=True, exist_ok=True)
+    return f"sqlite+pysqlite:///{(data_dir / 'civicnotice-workpapers.db').as_posix()}"
+
+
+def _uses_default_workpaper_database() -> bool:
+    return not os.environ.get("CIVICNOTICE_WORKPAPER_DB_URL")
 
 def _get_workpaper_repository() -> NoticeWorkpaperRepository:
     global _workpaper_db_url, _workpaper_repository
     db_url = _workpaper_database_url()
-    if db_url is None:
-        raise RuntimeError("CIVICNOTICE_WORKPAPER_DB_URL is not configured.")
     if _workpaper_repository is None or db_url != _workpaper_db_url:
         _dispose_workpaper_repository()
         _workpaper_db_url = db_url
@@ -196,3 +286,44 @@ def _stored_notice_response(stored: StoredNoticeRecord) -> dict[str, object]:
 
 def _stored_deadline_response(stored: StoredDeadlinePlan) -> dict[str, object]:
     return {"plan_id": stored.plan_id, "notice_type": stored.notice_type, "event_date": stored.event_date.isoformat(), "reminders": list(stored.reminders), "staff_review_required": stored.staff_review_required, "disclaimer": stored.disclaimer, "created_at": stored.created_at.isoformat()}
+
+
+def _staff_review_payload(item: StaffReviewQueueItem) -> dict[str, object]:
+    return {
+        "review_id": item.review_id,
+        "notice_id": item.notice_id,
+        "title": item.title,
+        "reason": item.reason,
+        "status": item.status,
+        "assigned_to": item.assigned_to,
+        "resolution": item.resolution,
+        "created_by": item.created_by,
+        "created_at": item.created_at.isoformat(),
+        "updated_at": item.updated_at.isoformat(),
+        "visibility": "staff_only",
+        "boundary": (
+            "Staff review queues support notice administration only; they do not publish notices, "
+            "determine legal sufficiency, or replace the notice system of record."
+        ),
+    }
+
+
+def _readiness_payload() -> dict[str, object]:
+    db_url = _workpaper_database_url()
+    repository = _get_workpaper_repository()
+    schema_status = repository.schema_status()
+    blockers: list[str] = []
+    if not schema_status.ready:
+        blockers.append("Initialize the CivicNotice local workpaper database schema.")
+    ready_for_public_use = not blockers
+    return {
+        "status": "ready" if ready_for_public_use else "not-ready",
+        "ready": ready_for_public_use,
+        "workpaper_database_configured": True,
+        "workpaper_database_url": db_url,
+        "using_default_local_database": _uses_default_workpaper_database(),
+        "schema_ready": schema_status.ready,
+        "schema_version": schema_status.schema_version,
+        "expected_schema_version": schema_status.expected_schema_version,
+        "blockers": blockers,
+    }

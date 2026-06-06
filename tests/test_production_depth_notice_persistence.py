@@ -51,9 +51,15 @@ def test_notice_persistence_api_round_trip(monkeypatch, tmp_path: Path) -> None:
 def test_get_registry_without_persistence_returns_actionable_503(monkeypatch) -> None:
     monkeypatch.delenv("CIVICNOTICE_WORKPAPER_DB_URL", raising=False)
     _dispose_workpaper_repository()
-    response = client.get("/api/v1/civicnotice/registry/example")
-    assert response.status_code == 503
-    assert "Set CIVICNOTICE_WORKPAPER_DB_URL" in response.json()["detail"]["fix"]
+    created = client.post(
+        "/api/v1/civicnotice/registry",
+        json={"notice_id": "N-LOCAL", "notice_type": "hearing", "owner": "Clerk"},
+    )
+    record_id = created.json()["record_id"]
+    response = client.get(f"/api/v1/civicnotice/registry/{record_id}")
+    assert created.status_code == 200
+    assert response.status_code == 200
+    assert response.json()["notice_id"] == "N-LOCAL"
 
 
 def test_get_deadline_missing_id_returns_actionable_404(monkeypatch, tmp_path: Path) -> None:
@@ -66,3 +72,54 @@ def test_get_deadline_missing_id_returns_actionable_404(monkeypatch, tmp_path: P
     assert response.status_code == 404
     assert "POST /api/v1/civicnotice/deadlines" in response.json()["detail"]["fix"]
     db_path.unlink()
+
+
+def test_staff_review_queue_requires_key_and_returns_items(monkeypatch) -> None:
+    monkeypatch.setenv("CIVICNOTICE_STAFF_API_KEY", "local-notice-key")
+    created = client.post(
+        "/api/v1/civicnotice/staff/reviews",
+        headers={
+            "X-CivicNotice-Role": "staff",
+            "X-CivicNotice-Staff-Key": "local-notice-key",
+        },
+        json={
+            "notice_id": "N-STAFF",
+            "title": "Public hearing notice review",
+            "reason": "Notice proof and publication channel need staff review.",
+        },
+    )
+
+    denied = client.get("/api/v1/civicnotice/staff/reviews")
+    allowed = client.get(
+        "/api/v1/civicnotice/staff/reviews",
+        headers={
+            "X-CivicNotice-Role": "staff",
+            "X-CivicNotice-Staff-Key": "local-notice-key",
+        },
+    )
+
+    assert created.status_code == 200
+    assert denied.status_code in {401, 403}
+    assert allowed.status_code == 200
+    assert allowed.json()["visibility"] == "staff_only"
+    assert allowed.json()["items"][0]["notice_id"] == "N-STAFF"
+
+
+def test_deadline_plan_creates_staff_review_queue_item(monkeypatch) -> None:
+    monkeypatch.setenv("CIVICNOTICE_STAFF_API_KEY", "local-notice-key")
+    plan = client.post(
+        "/api/v1/civicnotice/deadlines",
+        json={"notice_type": "hearing", "event_date": "2026-05-20", "lead_days": 10},
+    )
+    queue = client.get(
+        "/api/v1/civicnotice/staff/reviews",
+        headers={
+            "X-CivicNotice-Role": "staff",
+            "X-CivicNotice-Staff-Key": "local-notice-key",
+        },
+    )
+
+    assert plan.status_code == 200
+    assert plan.json()["staff_review_required"] is True
+    assert queue.status_code == 200
+    assert any("Deadline review" in item["title"] for item in queue.json()["items"])

@@ -4,6 +4,18 @@ All notable changes to CivicNotice will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Default local-first workpaper persistence through `CIVICNOTICE_DATA_DIR`.
+- Readiness and integration-contract endpoints for suite installer verification.
+- Staff review queue persistence, staff-key protected queue APIs, and `/civicnotice/staff`.
+
+### Changed
+
+- Aligned CivicNotice to the published `civiccore v1.2.0` release wheel.
+
 ## [0.1.2] - 2026-04-29
 
 ### Changed

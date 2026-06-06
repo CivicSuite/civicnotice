@@ -6,7 +6,6 @@ from pathlib import Path
 
 PLACEHOLDERS = {
     "audit",
-    "auth",
     "catalog",
     "connectors",
     "exemptions",
@@ -32,7 +31,7 @@ def main() -> int:
             if package in PLACEHOLDERS:
                 failures.append(
                     f"{path}: civiccore.{package} is a placeholder package in CivicCore. "
-                    "See AGENTS.md section 3.1."
+                    "CivicNotice may import published CivicCore v1.2.0 runtime packages only."
                 )
 
     if failures:

@@ -13,7 +13,7 @@ authors = [
   { name = "CivicSuite contributors" }
 ]
 dependencies = [
-  "civiccore @ https://github.com/CivicSuite/civiccore/releases/download/v0.9.0/civiccore-0.9.0-py3-none-any.whl",
+  "civiccore @ https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl#sha256=ea8a307778f593bb87d5969ba3fa5d0f887fd5f9f692cc7fca7c6fbfda5d9d65",
   "fastapi>=0.115.0,<1.0.0",
   "sqlalchemy>=2.0.0,<3.0.0",
   "uvicorn[standard]>=0.30.0,<1.0.0",
