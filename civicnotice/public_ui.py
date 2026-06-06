@@ -20,7 +20,7 @@ def render_public_lookup_page() -> str:
   .skip-link { position:absolute; left:1rem; top:-4rem; background:var(--ink); color:white; padding:.7rem 1rem; border-radius:999px; }
   .skip-link:focus { top:1rem; }
   header, main, footer { width:100%; max-width:1120px; margin:0 auto; padding-left:16px; padding-right:16px; }
-  header { padding:48px 0 24px; }
+  header { padding-top:48px; padding-bottom:24px; }
   .eyebrow { color:var(--blue); text-transform:uppercase; letter-spacing:.18em; font-weight:800; font-size:.78rem; }
   h1 { max-width:980px; margin:0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2.2rem,7vw,5.4rem); line-height:1.02; letter-spacing:-.04em; overflow-wrap:break-word; word-break:break-word; }
   .lede { max-width:840px; font-size:clamp(1.1rem,2.4vw,1.45rem); line-height:1.55; color:#31404a; }
@@ -89,7 +89,7 @@ def render_staff_page() -> str:
   html, body { max-width:100%; overflow-x:hidden; }
   body { margin:0; color:var(--ink); font-family:"Aptos","Segoe UI",sans-serif; background:#f3f8fb; }
   main, header, footer { width:100%; max-width:980px; margin:0 auto; padding-left:16px; padding-right:16px; }
-  header { padding:42px 0 22px; }
+  header { padding-top:42px; padding-bottom:22px; }
   .eyebrow { color:var(--blue); text-transform:uppercase; letter-spacing:.16em; font-weight:900; font-size:.78rem; }
   h1 { margin:.2rem 0 .6rem; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2rem,6vw,4.2rem); line-height:1.04; overflow-wrap:anywhere; }
   .lede { max-width:760px; color:#31404a; font-size:1.15rem; line-height:1.55; }

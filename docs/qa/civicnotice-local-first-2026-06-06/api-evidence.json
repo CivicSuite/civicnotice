@@ -1,0 +1,188 @@
+{
+  "health": {
+    "status": 200,
+    "data": {
+      "status": "ok",
+      "service": "civicnotice",
+      "version": "0.1.2",
+      "civiccore_version": "1.2.0"
+    }
+  },
+  "ready": {
+    "status": 200,
+    "data": {
+      "status": "ready",
+      "ready": true,
+      "workpaper_database_configured": true,
+      "workpaper_database_url": "sqlite+pysqlite:///C:/dev/Claude/civicnotice/.tmp-civicnotice-walkthrough-data/civicnotice-workpapers.db",
+      "using_default_local_database": true,
+      "schema_ready": true,
+      "schema_version": "civicnotice-local-first-v1",
+      "expected_schema_version": "civicnotice-local-first-v1",
+      "blockers": []
+    }
+  },
+  "contracts": {
+    "status": 200,
+    "data": {
+      "module": "civicnotice",
+      "version": "0.1.2",
+      "contracts": [
+        {
+          "name": "civicnotice.notice_registry.v1",
+          "endpoint": "/api/v1/civicnotice/registry",
+          "method": "POST",
+          "boundary": "Creates notice registry records; it does not publish official notices."
+        },
+        {
+          "name": "civicnotice.staff_review_queue.v1",
+          "endpoint": "/api/v1/civicnotice/staff/reviews",
+          "method": "GET",
+          "requires_staff_key": true,
+          "boundary": "Staff-only queue for notice, deadline, proof, and channel review."
+        },
+        {
+          "name": "civicnotice.publication_packet.v1",
+          "endpoint": "/api/v1/civicnotice/publication-check",
+          "method": "POST",
+          "boundary": "Builds publication checklists; it does not determine legal sufficiency."
+        },
+        {
+          "name": "civicnotice.records_export.v1",
+          "endpoint": "/api/v1/civicnotice/export",
+          "method": "POST",
+          "boundary": "Builds notice records export checklists; it does not publish or redact records."
+        }
+      ],
+      "downstream_ready_for": [
+        "civicclerk agenda public notices",
+        "civicboards vacancy public notices",
+        "civicprocure bid notices",
+        "civicrecords-ai notice file retention",
+        "civiclegal legal sufficiency review"
+      ]
+    }
+  },
+  "registryCreate": {
+    "status": 200,
+    "data": {
+      "record_id": "3395a65f-058b-4e8a-aba2-456a4ce9fd7c",
+      "notice_id": "NOTICE-WALK-001",
+      "notice_type": "public hearing",
+      "owner": "Clerk",
+      "registry_notes": [
+        "Confirm statutory authority, publication channel, lead time, and responsible reviewer.",
+        "Attach source agenda item, bid file, vacancy record, hearing record, or staff memo.",
+        "Route draft copy and publication proof through clerk/legal review before release."
+      ],
+      "disclaimer": "CivicNotice supports statutory notice administration, but staff remain responsible for deadlines, publication approvals, legal sufficiency, and the official notice record.",
+      "created_at": "2026-06-06T22:45:33.618809+00:00"
+    }
+  },
+  "registryGet": {
+    "status": 200,
+    "data": {
+      "record_id": "3395a65f-058b-4e8a-aba2-456a4ce9fd7c",
+      "notice_id": "NOTICE-WALK-001",
+      "notice_type": "public hearing",
+      "owner": "Clerk",
+      "registry_notes": [
+        "Confirm statutory authority, publication channel, lead time, and responsible reviewer.",
+        "Attach source agenda item, bid file, vacancy record, hearing record, or staff memo.",
+        "Route draft copy and publication proof through clerk/legal review before release."
+      ],
+      "disclaimer": "CivicNotice supports statutory notice administration, but staff remain responsible for deadlines, publication approvals, legal sufficiency, and the official notice record.",
+      "created_at": "2026-06-06T22:45:33.618809"
+    }
+  },
+  "deadlineCreate": {
+    "status": 200,
+    "data": {
+      "plan_id": "407f291d-0464-4a68-9912-5d7a124c16ae",
+      "notice_type": "public hearing",
+      "event_date": "2026-05-20",
+      "reminders": [
+        "2026-04-26: confirm statutory authority and publication channel.",
+        "2026-05-03: route draft copy for clerk/legal review.",
+        "2026-05-10: publish or file proof of publication deadline.",
+        "2026-05-20: verify final notice packet before hearing/opening/action."
+      ],
+      "staff_review_required": true,
+      "disclaimer": "CivicNotice supports statutory notice administration, but staff remain responsible for deadlines, publication approvals, legal sufficiency, and the official notice record.",
+      "created_at": "2026-06-06T22:45:33.638886+00:00"
+    }
+  },
+  "deadlineGet": {
+    "status": 200,
+    "data": {
+      "plan_id": "407f291d-0464-4a68-9912-5d7a124c16ae",
+      "notice_type": "public hearing",
+      "event_date": "2026-05-20",
+      "reminders": [
+        "2026-04-26: confirm statutory authority and publication channel.",
+        "2026-05-03: route draft copy for clerk/legal review.",
+        "2026-05-10: publish or file proof of publication deadline.",
+        "2026-05-20: verify final notice packet before hearing/opening/action."
+      ],
+      "staff_review_required": true,
+      "disclaimer": "CivicNotice supports statutory notice administration, but staff remain responsible for deadlines, publication approvals, legal sufficiency, and the official notice record.",
+      "created_at": "2026-06-06T22:45:33.638886"
+    }
+  },
+  "staffDenied": {
+    "status": 503,
+    "data": {
+      "detail": {
+        "message": "Staff API key auth is not configured.",
+        "fix": "Set CIVICNOTICE_STAFF_API_KEY before using staff-only routes."
+      }
+    }
+  },
+  "publication": {
+    "status": 200,
+    "data": {
+      "notice_type": "public hearing",
+      "checklist": [
+        "Confirm notice title, body, date/time/place, affected matter, and statutory citation.",
+        "Confirm publication channel 'official website' is authorized.",
+        "Verify lead time, posting location, language/accessibility needs, and proof requirements.",
+        "Preserve draft, approval, publication proof, screenshots, invoices, and final packet."
+      ],
+      "proof_required": true,
+      "disclaimer": "CivicNotice supports statutory notice administration, but staff remain responsible for deadlines, publication approvals, legal sufficiency, and the official notice record."
+    }
+  },
+  "channels": {
+    "status": 200,
+    "data": {
+      "notice_type": "public hearing",
+      "channels": [
+        "official posting board or website",
+        "newspaper or legal publication if required",
+        "agenda/packet page when tied to a meeting",
+        "accessible alternate format review"
+      ],
+      "accessibility_notes": [
+        "Audience context: residents and affected property owners.",
+        "Staff must verify language access, ADA format, and statutory publication requirements."
+      ],
+      "staff_review_required": true,
+      "disclaimer": "CivicNotice supports statutory notice administration, but staff remain responsible for deadlines, publication approvals, legal sufficiency, and the official notice record."
+    }
+  },
+  "export": {
+    "status": 200,
+    "data": {
+      "notice_id": "NOTICE-WALK-001",
+      "title": "Walkthrough notice records packet",
+      "checklist": [
+        "Preserve draft notice, final notice, approval record, publication proof, and source matter.",
+        "Confirm confidential, privileged, or closed-session material is excluded before release.",
+        "Include file hashes, export timestamp, notice identifier, channel, and reviewer initials.",
+        "Record whether the export is for public portal, records request, or staff archive."
+      ],
+      "retention_note": "Export format 'markdown' must follow the city's retention schedule.",
+      "disclaimer": "CivicNotice supports statutory notice administration, but staff remain responsible for deadlines, publication approvals, legal sufficiency, and the official notice record."
+    }
+  }
+}
