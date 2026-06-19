@@ -124,6 +124,20 @@ def test_get_deadline_missing_id_returns_actionable_404(monkeypatch, tmp_path: P
     db_path.unlink()
 
 
+def test_get_publication_proof_missing_id_returns_actionable_404(
+    monkeypatch, tmp_path: Path
+) -> None:
+    db_path = tmp_path / "civicnotice-proof-missing.db"
+    monkeypatch.setenv("CIVICNOTICE_WORKPAPER_DB_URL", f"sqlite+pysqlite:///{db_path.as_posix()}")
+    _dispose_workpaper_repository()
+    response = client.get("/api/v1/civicnotice/publication-proof/missing")
+    _dispose_workpaper_repository()
+    monkeypatch.delenv("CIVICNOTICE_WORKPAPER_DB_URL")
+    assert response.status_code == 404
+    assert "POST /api/v1/civicnotice/publication-proof" in response.json()["detail"]["fix"]
+    db_path.unlink()
+
+
 def test_publication_proof_without_persistence_returns_actionable_503(monkeypatch) -> None:
     monkeypatch.delenv("CIVICNOTICE_WORKPAPER_DB_URL", raising=False)
     _dispose_workpaper_repository()
