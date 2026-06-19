@@ -10,6 +10,7 @@ from civicnotice.notice_registry import register_notice_stub
 from civicnotice.publication_check import build_publication_checklist
 from civicnotice.records_export import build_notice_records_export
 from civicnotice.statutory_rules import check_statutory_notice_requirements
+from civicnotice.subscriber_delivery import Subscriber, build_subscriber_delivery_plan
 
 
 client = TestClient(app)
@@ -112,6 +113,45 @@ def test_channel_plan_flags_accessibility_review() -> None:
     assert any("ADA format" in note for note in result.accessibility_notes)
 
 
+def test_subscriber_delivery_plan_dedupes_and_flags_review() -> None:
+    result = build_subscriber_delivery_plan(
+        notice_id="hear-001",
+        notice_type="planning hearing",
+        audience="planning subscribers",
+        subscribers=(
+            Subscriber(
+                subscriber_id="1",
+                name="Alex Resident",
+                email="alex@example.gov",
+                channels=("Email",),
+                language="English",
+            ),
+            Subscriber(
+                subscriber_id="2",
+                name="Alex Duplicate",
+                email="ALEX@example.gov",
+                channels=("email",),
+                language="Spanish",
+            ),
+            Subscriber(
+                subscriber_id="3",
+                name="Inactive Resident",
+                email="inactive@example.gov",
+                channels=("email",),
+                language="English",
+                active=False,
+            ),
+        ),
+        required_channels=("email", "postal mail"),
+    )
+    assert result.active_subscriber_count == 2
+    assert result.suppressed_subscriber_count == 1
+    assert result.email_recipients == ("alex@example.gov",)
+    assert result.missing_required_channels == ("postal mail",)
+    assert result.language_review_required is True
+    assert result.staff_review_required is True
+
+
 def test_records_export_preserves_notice_context() -> None:
     result = build_notice_records_export(
         notice_id="hear-001",
@@ -172,6 +212,25 @@ def test_notice_support_apis_success_shape() -> None:
         "/api/v1/civicnotice/channels",
         json={"notice_type": "public hearing", "audience": "residents"},
     )
+    subscribers = client.post(
+        "/api/v1/civicnotice/subscribers/plan",
+        json={
+            "notice_id": "hear-001",
+            "notice_type": "public hearing",
+            "audience": "residents",
+            "subscribers": [
+                {
+                    "subscriber_id": "1",
+                    "name": "Alex Resident",
+                    "email": "alex@example.gov",
+                    "channels": ["email"],
+                    "language": "English",
+                    "active": True,
+                }
+            ],
+            "required_channels": ["email"],
+        },
+    )
     export = client.post(
         "/api/v1/civicnotice/export",
         json={"title": "Planning hearing notice archive", "notice_id": "hear-001"},
@@ -190,6 +249,9 @@ def test_notice_support_apis_success_shape() -> None:
     assert template.json()["staff_review_required"] is True
     assert channels.status_code == 200
     assert channels.json()["staff_review_required"] is True
+    assert subscribers.status_code == 200
+    assert subscribers.json()["email_recipients"] == ["alex@example.gov"]
+    assert subscribers.json()["missing_required_channels"] == []
     assert export.status_code == 200
     assert export.json()["notice_id"] == "hear-001"
 

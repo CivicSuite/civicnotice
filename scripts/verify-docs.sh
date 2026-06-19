@@ -34,6 +34,7 @@ required=(
   "civicnotice/notice_templates.py"
   "civicnotice/publication_check.py"
   "civicnotice/channel_plan.py"
+  "civicnotice/subscriber_delivery.py"
   "civicnotice/records_export.py"
   "civicnotice/public_ui.py"
 )

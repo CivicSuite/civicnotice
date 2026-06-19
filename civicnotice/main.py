@@ -23,6 +23,7 @@ from civicnotice.public_ui import render_public_lookup_page
 from civicnotice.publication_check import build_publication_checklist
 from civicnotice.records_export import build_notice_records_export
 from civicnotice.statutory_rules import check_statutory_notice_requirements
+from civicnotice.subscriber_delivery import Subscriber, build_subscriber_delivery_plan
 
 
 app = FastAPI(
@@ -74,6 +75,23 @@ class NoticeTemplateRequest(BaseModel):
 class ChannelRequest(BaseModel):
     notice_type: str
     audience: str
+
+
+class SubscriberRequest(BaseModel):
+    subscriber_id: str
+    name: str
+    email: str = ""
+    channels: list[str] = Field(default_factory=list)
+    language: str = "English"
+    active: bool = True
+
+
+class SubscriberDeliveryRequest(BaseModel):
+    notice_id: str
+    notice_type: str
+    audience: str
+    subscribers: list[SubscriberRequest] = Field(default_factory=list)
+    required_channels: list[str] = Field(default_factory=lambda: ["email"])
 
 
 class RecordsExportRequest(BaseModel):
@@ -307,6 +325,28 @@ def channel_plan(request: ChannelRequest) -> dict[str, object]:
     return plan_notice_channels(
         notice_type=request.notice_type,
         audience=request.audience,
+    ).__dict__
+
+
+@app.post("/api/v1/civicnotice/subscribers/plan")
+def subscriber_delivery_plan(request: SubscriberDeliveryRequest) -> dict[str, object]:
+    subscribers = tuple(
+        Subscriber(
+            subscriber_id=subscriber.subscriber_id,
+            name=subscriber.name,
+            email=subscriber.email,
+            channels=tuple(subscriber.channels),
+            language=subscriber.language,
+            active=subscriber.active,
+        )
+        for subscriber in request.subscribers
+    )
+    return build_subscriber_delivery_plan(
+        notice_id=request.notice_id,
+        notice_type=request.notice_type,
+        audience=request.audience,
+        subscribers=subscribers,
+        required_channels=tuple(request.required_channels),
     ).__dict__
 
 

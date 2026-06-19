@@ -1,8 +1,8 @@
 # CivicNotice
 
-CivicNotice is the CivicSuite module for public hearing notices, legal notices, bid notices, vacancy notices, statutory publication deadlines, statutory rule checks, notice drafting templates, publication-readiness review, channel planning, and notice-record export checklists.
+CivicNotice is the CivicSuite module for public hearing notices, legal notices, bid notices, vacancy notices, statutory publication deadlines, statutory rule checks, notice drafting templates, publication-readiness review, channel planning, subscriber delivery planning, and notice-record export checklists.
 
-Current state: **v0.1.3 notice compliance foundation release**, aligned to the `civiccore v1.2.0` release wheel. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample notice registry, CivicCore-backed statutory deadline plans, deterministic statutory rule checks, notice drafting templates, optional database-backed registry/deadline/publication-proof workpapers, publication-readiness checklists, channel-planning helpers, notice/records export checklist, and accessible public sample UI at `/civicnotice`. It does **not** ship legal sufficiency decisions, legal advice, live LLM calls, official notice publication, publication-system write-back, or notice system-of-record integrations.
+Current state: **v0.1.3 notice compliance foundation release**, aligned to the `civiccore v1.2.0` release wheel. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample notice registry, CivicCore-backed statutory deadline plans, deterministic statutory rule checks, notice drafting templates, optional database-backed registry/deadline/publication-proof workpapers, publication-readiness checklists, channel-planning helpers, subscriber delivery planning, notice/records export checklist, and accessible public sample UI at `/civicnotice`. It does **not** ship legal sufficiency decisions, legal advice, live LLM calls, official notice publication, publication-system write-back, or notice system-of-record integrations.
 
 ## What CivicNotice Does
 
@@ -14,6 +14,7 @@ Current state: **v0.1.3 notice compliance foundation release**, aligned to the `
 - Store staff-reviewed publication proof packets linked to upstream Clerk, procurement, board, or manual source records.
 - Assemble publication-readiness checklists for staff review.
 - Plan notice channels and accessibility-review needs.
+- Build subscriber delivery plans without sending notices or storing subscriber PII.
 - Produce notice and records export checklists.
 - Demonstrate a public notice-support UI at `/civicnotice`.
 
@@ -41,6 +42,7 @@ Current state: **v0.1.3 notice compliance foundation release**, aligned to the `
 - `GET /api/v1/civicnotice/publication-proof/{proof_id}` retrieves a persisted publication proof workpaper.
 - `POST /api/v1/civicnotice/publication-check` returns a publication-readiness checklist.
 - `POST /api/v1/civicnotice/channels` returns channel planning flags.
+- `POST /api/v1/civicnotice/subscribers/plan` returns a subscriber delivery plan.
 - `POST /api/v1/civicnotice/export` returns a notice and records export checklist.
 
 ## Local Development
