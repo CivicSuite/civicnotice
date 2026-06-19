@@ -3,6 +3,7 @@ from datetime import date
 from fastapi.testclient import TestClient
 
 from civicnotice.accessibility_review import build_accessibility_review
+from civicnotice.archive_packet import build_notice_archive_packet
 from civicnotice.channel_plan import plan_notice_channels
 from civicnotice.deadline_tracker import build_deadline_plan
 from civicnotice.main import app
@@ -174,6 +175,36 @@ def test_accessibility_review_flags_language_and_plain_language_needs() -> None:
     assert result.staff_review_required is True
 
 
+def test_archive_packet_tracks_missing_and_complete_evidence() -> None:
+    incomplete = build_notice_archive_packet(
+        notice_id="hear-001",
+        notice_type="planning hearing",
+        source_module="civicclerk",
+        source_record_id="meeting-42",
+        registry_record_id="registry-1",
+        deadline_plan_id="deadline-1",
+    )
+    complete = build_notice_archive_packet(
+        notice_id="hear-001",
+        notice_type="planning hearing",
+        source_module="civicclerk",
+        source_record_id="meeting-42",
+        registry_record_id="registry-1",
+        deadline_plan_id="deadline-1",
+        publication_proof_id="proof-1",
+        rule_check_complete=True,
+        template_complete=True,
+        accessibility_review_complete=True,
+        subscriber_delivery_complete=True,
+        records_export_complete=True,
+    )
+    assert incomplete.readiness_status == "archive_packet_incomplete_staff_review_required"
+    assert "publication proof" in incomplete.missing_items
+    assert complete.readiness_status == "archive_packet_ready_for_staff_final_review"
+    assert complete.missing_items == ()
+    assert complete.handoff_targets == ("civicclerk", "civicrecords")
+
+
 def test_records_export_preserves_notice_context() -> None:
     result = build_notice_records_export(
         notice_id="hear-001",
@@ -266,6 +297,23 @@ def test_notice_support_apis_success_shape() -> None:
             "has_plain_language_summary": False,
         },
     )
+    archive = client.post(
+        "/api/v1/civicnotice/archive-packet",
+        json={
+            "notice_id": "hear-001",
+            "notice_type": "public hearing",
+            "source_module": "civicclerk",
+            "source_record_id": "meeting-42",
+            "registry_record_id": "registry-1",
+            "deadline_plan_id": "deadline-1",
+            "publication_proof_id": "proof-1",
+            "rule_check_complete": True,
+            "template_complete": True,
+            "accessibility_review_complete": True,
+            "subscriber_delivery_complete": True,
+            "records_export_complete": True,
+        },
+    )
     export = client.post(
         "/api/v1/civicnotice/export",
         json={"title": "Planning hearing notice archive", "notice_id": "hear-001"},
@@ -292,6 +340,9 @@ def test_notice_support_apis_success_shape() -> None:
         "Prepare human-approved Spanish notice version or language-access note."
     ]
     assert accessibility.json()["staff_review_required"] is True
+    assert archive.status_code == 200
+    assert archive.json()["readiness_status"] == "archive_packet_ready_for_staff_final_review"
+    assert archive.json()["handoff_targets"] == ["civicclerk", "civicrecords"]
     assert export.status_code == 200
     assert export.json()["notice_id"] == "hear-001"
 

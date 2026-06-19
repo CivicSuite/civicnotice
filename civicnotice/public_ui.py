@@ -47,7 +47,7 @@ def render_public_lookup_page() -> str:
 <header>
   <p class="eyebrow">CivicSuite / CivicNotice public sample</p>
   <h1>Public notices with fewer missed deadlines.</h1>
-  <p class="lede">CivicNotice demonstrates notice administration support: registry stubs, deadline plans, publication-readiness checks, channel planning, and proof-preserving records exports without publishing official notice.</p>
+  <p class="lede">CivicNotice demonstrates notice administration support: registry stubs, deadline plans, rule checks, templates, accessibility review, subscriber delivery planning, archive packets, and proof-preserving records exports without publishing official notice.</p>
   <p><span class="badge">v0.1.3 notice compliance foundation</span></p>
 </header>
 <main id="main" tabindex="-1">
@@ -59,7 +59,7 @@ def render_public_lookup_page() -> str:
       <button type="button">Draft sample notice file</button>
       <div class="result" role="status" aria-live="polite">
         <h3>Staff review packet</h3>
-        <ul><li>Confirm statutory authority, publication channel, lead time, and reviewer.</li><li>Route draft copy for clerk/legal review before publication.</li><li>Preserve final notice, proof, screenshots, invoices, and source matter.</li></ul>
+        <ul><li>Confirm statutory authority, publication channel, lead time, and reviewer.</li><li>Route draft copy for clerk/legal review before publication.</li><li>Check accessibility, language access, subscriber delivery, proof, and archive handoff before closing the file.</li></ul>
       </div>
     </article>
     <article class="card"><p class="kicker">Deadlines</p><h2>Lead-time reminders</h2><div class="result"><p>CivicNotice calculates review milestones; staff verify the legal deadline.</p></div></article>

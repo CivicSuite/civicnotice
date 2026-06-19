@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from civicnotice import __version__
 from civicnotice.accessibility_review import build_accessibility_review
+from civicnotice.archive_packet import build_notice_archive_packet
 from civicnotice.channel_plan import plan_notice_channels
 from civicnotice.deadline_tracker import build_deadline_plan
 from civicnotice.notice_templates import build_notice_template
@@ -106,6 +107,21 @@ class AccessibilityReviewRequest(BaseModel):
     has_plain_language_summary: bool = False
 
 
+class ArchivePacketRequest(BaseModel):
+    notice_id: str
+    notice_type: str
+    source_module: str = "manual"
+    source_record_id: str = ""
+    registry_record_id: str = ""
+    deadline_plan_id: str = ""
+    publication_proof_id: str = ""
+    rule_check_complete: bool = False
+    template_complete: bool = False
+    accessibility_review_complete: bool = False
+    subscriber_delivery_complete: bool = False
+    records_export_complete: bool = False
+
+
 class RecordsExportRequest(BaseModel):
     notice_id: str
     title: str
@@ -135,7 +151,7 @@ def root() -> dict[str, str]:
         "status": "notice compliance foundation",
         "message": (
             "CivicNotice package, API foundation, sample notice registry, CivicCore-backed deadline plans, "
-            "statutory rule checks, notice drafting templates, accessibility and language-readiness packets, publication-readiness checklist, channel planning, records export checklist, optional "
+            "statutory rule checks, notice drafting templates, accessibility and language-readiness packets, archive/handoff packets, publication-readiness checklist, channel planning, records export checklist, optional "
             "database-backed registry/deadline/publication-proof workpapers, and public UI foundation are online; official "
             "legal sufficiency decisions, official publication, legal "
             "advice, live LLM calls, publication-system write-back, and notice system-of-record integrations "
@@ -373,6 +389,24 @@ def accessibility_review(request: AccessibilityReviewRequest) -> dict[str, objec
         has_contact=request.has_contact,
         has_event_date=request.has_event_date,
         has_plain_language_summary=request.has_plain_language_summary,
+    ).__dict__
+
+
+@app.post("/api/v1/civicnotice/archive-packet")
+def archive_packet(request: ArchivePacketRequest) -> dict[str, object]:
+    return build_notice_archive_packet(
+        notice_id=request.notice_id,
+        notice_type=request.notice_type,
+        source_module=request.source_module,
+        source_record_id=request.source_record_id,
+        registry_record_id=request.registry_record_id,
+        deadline_plan_id=request.deadline_plan_id,
+        publication_proof_id=request.publication_proof_id,
+        rule_check_complete=request.rule_check_complete,
+        template_complete=request.template_complete,
+        accessibility_review_complete=request.accessibility_review_complete,
+        subscriber_delivery_complete=request.subscriber_delivery_complete,
+        records_export_complete=request.records_export_complete,
     ).__dict__
 
 

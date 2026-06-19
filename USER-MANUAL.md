@@ -2,7 +2,7 @@
 
 ## For Non-Technical Users
 
-CivicNotice helps city staff organize public hearing notices, legal notices, bid notices, vacancy notices, publication deadlines, channel planning notes, accessibility and language-readiness checks, proof requirements, subscriber delivery plans, and export manifests. It can create a sample notice registry stub, build publication deadline reminders, check a draft packet against deterministic staff-review rules, create a staff-editable notice template, retrieve saved registry/deadline/publication-proof workpapers when IT enables persistence, assemble publication-readiness checklists, summarize channel planning, build accessibility/plain-language/translation readiness packets, build subscriber delivery plans, and assemble a notice/records export checklist.
+CivicNotice helps city staff organize public hearing notices, legal notices, bid notices, vacancy notices, publication deadlines, channel planning notes, accessibility and language-readiness checks, proof requirements, subscriber delivery plans, archive/handoff packets, and export manifests. It can create a sample notice registry stub, build publication deadline reminders, check a draft packet against deterministic staff-review rules, create a staff-editable notice template, retrieve saved registry/deadline/publication-proof workpapers when IT enables persistence, assemble publication-readiness checklists, summarize channel planning, build accessibility/plain-language/translation readiness packets, build subscriber delivery plans, assemble archive/handoff packets, and assemble a notice/records export checklist.
 
 Current state: `0.1.3` notice compliance foundation release, aligned to the `civiccore v1.2.0` release wheel. CivicNotice uses the shared CivicCore notice-deadline helper for deterministic reminder plans, but it still does not decide legal sufficiency, publish official notices, provide legal advice, call live LLMs, write back to publication systems, or update a notice system of record. Staff own every decision.
 
@@ -27,6 +27,7 @@ Set `CIVICNOTICE_WORKPAPER_DB_URL` to enable SQLAlchemy-backed notice registry, 
 - `POST /api/v1/civicnotice/accessibility-review`
 - `POST /api/v1/civicnotice/channels`
 - `POST /api/v1/civicnotice/subscribers/plan`
+- `POST /api/v1/civicnotice/archive-packet`
 - `POST /api/v1/civicnotice/export`
 
 Run:
@@ -48,4 +49,4 @@ flowchart LR
   CivicNotice --> Export["Notice and records export checklist"]
 ```
 
-CivicNotice depends on CivicCore. CivicCore does not depend on CivicNotice. CivicNotice v0.1.3 uses the shared CivicCore notice deadline helper plus deterministic sample notice data, staff-review rule packs, notice templates, accessibility and language-readiness packets, subscriber delivery plans, and optional publication-proof workpapers only; live agenda/procurement handoffs, legal sufficiency decisions, legal advice, official notice publication, publication-system write-back, and production notice-system integrations are future work.
+CivicNotice depends on CivicCore. CivicCore does not depend on CivicNotice. CivicNotice v0.1.3 uses the shared CivicCore notice deadline helper plus deterministic sample notice data, staff-review rule packs, notice templates, accessibility and language-readiness packets, subscriber delivery plans, archive/handoff packets, and optional publication-proof workpapers only; live agenda/procurement handoffs, legal sufficiency decisions, legal advice, official notice publication, publication-system write-back, and production notice-system integrations are future work.
