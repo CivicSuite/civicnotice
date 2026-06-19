@@ -9,6 +9,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from civicnotice import __version__
+from civicnotice.accessibility_review import build_accessibility_review
 from civicnotice.channel_plan import plan_notice_channels
 from civicnotice.deadline_tracker import build_deadline_plan
 from civicnotice.notice_templates import build_notice_template
@@ -94,6 +95,17 @@ class SubscriberDeliveryRequest(BaseModel):
     required_channels: list[str] = Field(default_factory=lambda: ["email"])
 
 
+class AccessibilityReviewRequest(BaseModel):
+    notice_id: str
+    title: str
+    notice_text: str
+    target_languages: list[str] = Field(default_factory=list)
+    attachments: list[str] = Field(default_factory=list)
+    has_contact: bool = False
+    has_event_date: bool = False
+    has_plain_language_summary: bool = False
+
+
 class RecordsExportRequest(BaseModel):
     notice_id: str
     title: str
@@ -123,7 +135,7 @@ def root() -> dict[str, str]:
         "status": "notice compliance foundation",
         "message": (
             "CivicNotice package, API foundation, sample notice registry, CivicCore-backed deadline plans, "
-            "statutory rule checks, notice drafting templates, publication-readiness checklist, channel planning, records export checklist, optional "
+            "statutory rule checks, notice drafting templates, accessibility and language-readiness packets, publication-readiness checklist, channel planning, records export checklist, optional "
             "database-backed registry/deadline/publication-proof workpapers, and public UI foundation are online; official "
             "legal sufficiency decisions, official publication, legal "
             "advice, live LLM calls, publication-system write-back, and notice system-of-record integrations "
@@ -347,6 +359,20 @@ def subscriber_delivery_plan(request: SubscriberDeliveryRequest) -> dict[str, ob
         audience=request.audience,
         subscribers=subscribers,
         required_channels=tuple(request.required_channels),
+    ).__dict__
+
+
+@app.post("/api/v1/civicnotice/accessibility-review")
+def accessibility_review(request: AccessibilityReviewRequest) -> dict[str, object]:
+    return build_accessibility_review(
+        notice_id=request.notice_id,
+        title=request.title,
+        notice_text=request.notice_text,
+        target_languages=tuple(request.target_languages),
+        attachments=tuple(request.attachments),
+        has_contact=request.has_contact,
+        has_event_date=request.has_event_date,
+        has_plain_language_summary=request.has_plain_language_summary,
     ).__dict__
 
 

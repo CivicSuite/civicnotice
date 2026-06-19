@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added durable publication-proof workpapers for staff evidence packets linked to Clerk, procurement, board, or manual source records.
 - Added deterministic statutory rule checks and staff-editable notice drafting templates for common notice types.
 - Added subscriber delivery planning with active/suppressed subscriber accounting, deduped email recipients, required-channel checks, and language-review flags.
+- Added accessibility, plain-language, and human-approved translation readiness packets for public notices.
 - Preserved the deterministic notice registry, deadline tracking, publication-readiness, channel-planning, records-export, optional workpaper persistence, and honest unshipped-boundary behavior from v0.1.2.
 
 ## [0.1.2] - 2026-04-29

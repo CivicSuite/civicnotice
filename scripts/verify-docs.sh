@@ -28,6 +28,7 @@ required=(
   "pyproject.toml"
   "civicnotice/__init__.py"
   "civicnotice/main.py"
+  "civicnotice/accessibility_review.py"
   "civicnotice/notice_registry.py"
   "civicnotice/deadline_tracker.py"
   "civicnotice/statutory_rules.py"

@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi.testclient import TestClient
 
+from civicnotice.accessibility_review import build_accessibility_review
 from civicnotice.channel_plan import plan_notice_channels
 from civicnotice.deadline_tracker import build_deadline_plan
 from civicnotice.main import app
@@ -152,6 +153,27 @@ def test_subscriber_delivery_plan_dedupes_and_flags_review() -> None:
     assert result.staff_review_required is True
 
 
+def test_accessibility_review_flags_language_and_plain_language_needs() -> None:
+    result = build_accessibility_review(
+        notice_id="hear-001",
+        title="Planning hearing",
+        notice_text="Pursuant to the aforementioned provisions, the city hereby notices a hearing.",
+        target_languages=("English", "Spanish"),
+        attachments=("notice.pdf",),
+        has_contact=False,
+        has_event_date=True,
+        has_plain_language_summary=False,
+    )
+    assert "public contact for accommodations or questions" in result.missing_accessibility_items
+    assert "plain-language summary for public readers" in result.missing_accessibility_items
+    assert "legal or technical jargon review" in result.plain_language_flags
+    assert result.translation_tasks == (
+        "Prepare human-approved Spanish notice version or language-access note.",
+    )
+    assert result.attachment_review_required is True
+    assert result.staff_review_required is True
+
+
 def test_records_export_preserves_notice_context() -> None:
     result = build_notice_records_export(
         notice_id="hear-001",
@@ -231,6 +253,19 @@ def test_notice_support_apis_success_shape() -> None:
             "required_channels": ["email"],
         },
     )
+    accessibility = client.post(
+        "/api/v1/civicnotice/accessibility-review",
+        json={
+            "notice_id": "hear-001",
+            "title": "Planning hearing",
+            "notice_text": "Pursuant to the applicable provisions, a hearing is scheduled.",
+            "target_languages": ["Spanish"],
+            "attachments": ["notice.pdf"],
+            "has_contact": True,
+            "has_event_date": True,
+            "has_plain_language_summary": False,
+        },
+    )
     export = client.post(
         "/api/v1/civicnotice/export",
         json={"title": "Planning hearing notice archive", "notice_id": "hear-001"},
@@ -252,6 +287,11 @@ def test_notice_support_apis_success_shape() -> None:
     assert subscribers.status_code == 200
     assert subscribers.json()["email_recipients"] == ["alex@example.gov"]
     assert subscribers.json()["missing_required_channels"] == []
+    assert accessibility.status_code == 200
+    assert accessibility.json()["translation_tasks"] == [
+        "Prepare human-approved Spanish notice version or language-access note."
+    ]
+    assert accessibility.json()["staff_review_required"] is True
     assert export.status_code == 200
     assert export.json()["notice_id"] == "hear-001"
 
