@@ -1,9 +1,9 @@
 # CivicNotice Reconciliation
 
-| Driver | CivicNotice v0.1.2 result |
+| Driver | CivicNotice v0.2.0 result |
 |---|---|
-| Unified spec CivicNotice catalog entry | notice registry, deadline tracking, publication readiness tracking, channel planning, and notice/records export checklists represented through deterministic helpers. |
+| Unified spec CivicNotice catalog entry | notice registry, deadline tracking, deterministic statutory rule checks, notice drafting templates, publication readiness tracking, channel planning, and notice/records export checklists represented through deterministic helpers. |
 | Apache 2.0 code licensing | `LICENSE-CODE` and package metadata use Apache 2.0. |
 | Documentation licensing | `LICENSE-DOCS` uses CC BY 4.0. |
-| CivicCore dependency | `pyproject.toml` pins the `civiccore v0.9.0` release wheel. |
+| CivicCore dependency | `pyproject.toml` pins the `civiccore v1.2.0` release wheel. |
 | Shipped/planned honesty | Legal sufficiency decisions, legal advice, live LLM calls, official notice publication, publication-system write-back, and notice system-of-record integrations remain explicitly unshipped. |

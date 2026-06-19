@@ -1,0 +1,7 @@
+{
+  "name": "CivicNotice",
+  "version": "0.2.0",
+  "status": "notice compliance foundation",
+  "message": "CivicNotice package, API foundation, sample notice registry, CivicCore-backed deadline plans, statutory rule checks, notice drafting templates, accessibility and language-readiness packets, archive/handoff packets, publication-readiness checklist, channel planning, records export checklist, optional database-backed registry/deadline/publication-proof workpapers, and public UI foundation are online; official legal sufficiency decisions, official publication, legal advice, live LLM calls, publication-system write-back, and notice system-of-record integrations are not implemented yet.",
+  "next_step": "Post-v0.2.0 roadmap: jurisdiction-specific statutory rule packs, live CivicClerk/CivicProcure/CivicNotice handoffs, and publication proof queues"
+}

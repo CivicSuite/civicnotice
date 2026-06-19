@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.1.2"
+VERSION="0.2.0"
+CIVICCORE_WHEEL_URL="https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl"
+CIVICCORE_WHEEL_SHA256="a94ce958e36fb03c8d961e4db4672ce5bcfa25765c57d75886e999cf15703ec7"
 
 find_python() {
   local candidates=()
@@ -40,7 +42,7 @@ ${PYTHON_BIN} - <<'PY'
 from pathlib import Path
 import tomllib
 
-version = "0.1.2"
+version = "0.2.0"
 root = Path(".")
 pyproject = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
 assert pyproject["project"]["version"] == version, pyproject["project"]["version"]
@@ -56,13 +58,42 @@ for path in [
     "SECURITY.md",
 ]:
     text = (root / path).read_text(encoding="utf-8")
-    assert "0.1.2" in text, f"missing release version in {path}"
+    assert "0.2.0" in text, f"missing release version in {path}"
     assert "0.1.0.dev0" not in text, f"stale dev version in {path}"
 print("PASS: version surfaces synchronized")
 PY
 
+echo "==> CivicCore wheel provenance"
+${PYTHON_BIN} - <<PY
+from pathlib import Path
+from urllib.request import urlopen
+import hashlib
+import tempfile
+
+url = "${CIVICCORE_WHEEL_URL}"
+expected = "${CIVICCORE_WHEEL_SHA256}"
+with urlopen(url, timeout=30) as response:
+    data = response.read()
+actual = hashlib.sha256(data).hexdigest()
+assert actual == expected, actual
+path = Path(tempfile.gettempdir()) / "civiccore-1.2.0-py3-none-any.whl.sha256"
+path.write_text(f"{actual}  civiccore-1.2.0-py3-none-any.whl\\n", encoding="utf-8")
+print("PASS: CivicCore 1.2.0 wheel SHA-256 verified")
+PY
+
 echo "==> Test suite"
-${PYTHON_BIN} -m pytest -q
+if [[ -z "${CIVICNOTICE_POSTGRES_TEST_URL:-}" ]]; then
+  echo "FAIL: CIVICNOTICE_POSTGRES_TEST_URL is required for the release gate so PostgreSQL persistence coverage cannot be skipped." >&2
+  exit 1
+fi
+${PYTHON_BIN} - <<'PY'
+import os
+assert os.environ.get("CIVICNOTICE_POSTGRES_TEST_URL"), (
+    "CIVICNOTICE_POSTGRES_TEST_URL is not visible to the selected Python interpreter."
+)
+print("PASS: PostgreSQL test URL is visible to the selected Python interpreter")
+PY
+${PYTHON_BIN} -m pytest -q --cov=civicnotice --cov-branch --cov-fail-under=90
 
 echo "==> Documentation gate"
 bash scripts/verify-docs.sh
@@ -81,8 +112,8 @@ from pathlib import Path
 import hashlib
 
 dist = Path("dist")
-wheel = dist / "civicnotice-0.1.2-py3-none-any.whl"
-sdist = dist / "civicnotice-0.1.2.tar.gz"
+wheel = dist / "civicnotice-0.2.0-py3-none-any.whl"
+sdist = dist / "civicnotice-0.2.0.tar.gz"
 assert wheel.exists(), f"missing {wheel}"
 assert sdist.exists(), f"missing {sdist}"
 lines = []

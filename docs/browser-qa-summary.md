@@ -1,6 +1,8 @@
-# Browser QA Summary
+# Historical Browser QA Summary
 
-Status: PASS
+This archived browser QA note records the 2026-04-27 pre-0.2.0 browser pass. It is not current release evidence for CivicNotice v0.2.0; current release evidence is under `docs/audits/gauntletgate-civicnotice-0.2.0-2026-06-19/artifacts/`.
+
+Historical status: PASS
 
 Checked at: 2026-04-27T22:25:26.910Z
 

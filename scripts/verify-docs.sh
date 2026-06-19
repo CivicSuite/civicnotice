@@ -28,10 +28,15 @@ required=(
   "pyproject.toml"
   "civicnotice/__init__.py"
   "civicnotice/main.py"
+  "civicnotice/accessibility_review.py"
+  "civicnotice/archive_packet.py"
   "civicnotice/notice_registry.py"
   "civicnotice/deadline_tracker.py"
+  "civicnotice/statutory_rules.py"
+  "civicnotice/notice_templates.py"
   "civicnotice/publication_check.py"
   "civicnotice/channel_plan.py"
+  "civicnotice/subscriber_delivery.py"
   "civicnotice/records_export.py"
   "civicnotice/public_ui.py"
 )
@@ -56,13 +61,28 @@ bad_markers=(
   "production staff-review queues are available"
 )
 
-for file in "${current_files[@]}"; do
-  for marker in "${bad_markers[@]}"; do
-    if grep -Fqi "$marker" "$file"; then
-      echo "FAIL: stale/planned-as-shipped marker '$marker' found in $file" >&2
-      exit 1
-    fi
-  done
-done
+DOCS_PYTHON="${CIVICNOTICE_RELEASE_PYTHON:-python}"
+"${DOCS_PYTHON}" - <<'PY'
+from pathlib import Path
+
+current_files = ("README.md", "README.txt", "USER-MANUAL.md", "docs/index.html")
+bad_markers = (
+    "official legal sufficiency decisions are available",
+    "legal advice is available",
+    "official publication is available",
+    "live LLM calls are available",
+    "publication-system write-back is available",
+    "system-of-record integrations are available",
+    "production staff-review queues are available",
+)
+
+for filename in current_files:
+    text = Path(filename).read_text(encoding="utf-8").casefold()
+    for marker in bad_markers:
+        if marker.casefold() in text:
+            raise SystemExit(
+                f"FAIL: stale/planned-as-shipped marker '{marker}' found in {filename}"
+            )
+PY
 
 echo "VERIFY-DOCS: PASSED"

@@ -1,4 +1,4 @@
-"""Notice registry helpers for CivicNotice v0.1.2."""
+"""Notice registry helpers for CivicNotice v0.2.0."""
 
 from __future__ import annotations
 

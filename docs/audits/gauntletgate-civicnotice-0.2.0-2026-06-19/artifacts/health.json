@@ -1,0 +1,6 @@
+{
+  "status": "ok",
+  "service": "civicnotice",
+  "version": "0.2.0",
+  "civiccore_version": "1.2.0"
+}

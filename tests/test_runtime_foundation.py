@@ -8,7 +8,7 @@ client = TestClient(app)
 
 
 def test_package_version_is_012() -> None:
-    assert civicnotice.__version__ == "0.1.2"
+    assert civicnotice.__version__ == "0.2.0"
 
 
 def test_root_endpoint_states_runtime_boundary() -> None:
@@ -18,9 +18,10 @@ def test_root_endpoint_states_runtime_boundary() -> None:
     assert data["name"] == "CivicNotice"
     assert data["status"] == "notice compliance foundation"
     assert "CivicCore-backed deadline plans" in data["message"]
-    assert "database-backed registry/deadline workpapers" in data["message"]
+    assert "archive/handoff packets" in data["message"]
+    assert "database-backed registry/deadline/publication-proof workpapers" in data["message"]
     assert "official publication" in data["message"]
-    assert "Post-v0.1.2 roadmap" in data["next_step"]
+    assert "Post-v0.2.0 roadmap" in data["next_step"]
 
 
 def test_health_endpoint_reports_versions() -> None:
@@ -29,5 +30,5 @@ def test_health_endpoint_reports_versions() -> None:
     data = response.json()
     assert data["status"] == "ok"
     assert data["service"] == "civicnotice"
-    assert data["version"] == "0.1.2"
-    assert data["civiccore_version"] == "0.9.0"
+    assert data["version"] == "0.2.0"
+    assert data["civiccore_version"] == "1.2.0"

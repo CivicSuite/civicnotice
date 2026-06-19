@@ -1,10 +1,10 @@
 # Browser QA: Production Depth Notice Workpaper Persistence
 
-Target: file:///C:/Users/scott/OneDrive/Desktop/Claude/civicnotice/docs/index.html
+Target: docs/index.html from the local repository checkout.
 
 ## desktop
 
-Screenshot: C:\Users\scott\OneDrive\Desktop\Claude\civicnotice\docs\browser-qa-production-depth-notice-workpaper-persistence-desktop.png
+Screenshot: docs/browser-qa-production-depth-notice-workpaper-persistence-desktop.png
 
 - versionVisible: PASS
 - persistenceVisible: PASS
@@ -16,7 +16,7 @@ Screenshot: C:\Users\scott\OneDrive\Desktop\Claude\civicnotice\docs\browser-qa-p
 
 ## mobile
 
-Screenshot: C:\Users\scott\OneDrive\Desktop\Claude\civicnotice\docs\browser-qa-production-depth-notice-workpaper-persistence-mobile.png
+Screenshot: docs/browser-qa-production-depth-notice-workpaper-persistence-mobile.png
 
 - versionVisible: PASS
 - persistenceVisible: PASS
