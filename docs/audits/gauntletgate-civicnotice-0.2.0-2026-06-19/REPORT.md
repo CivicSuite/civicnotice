@@ -4,11 +4,11 @@ Date: 2026-06-19
 
 Reviewed release: CivicNotice 0.2.0
 
-Final reviewed commit: pending final evidence commit
+Final reviewed commit: 028a5954b4a7cc119a5b46e219f47e2101aa328c
 
 ## Verdict
 
-Pending final CI confirmation for the evidence commit.
+Pending final CI confirmation for commit 028a5954b4a7cc119a5b46e219f47e2101aa328c.
 
 ## Gate Scope
 
