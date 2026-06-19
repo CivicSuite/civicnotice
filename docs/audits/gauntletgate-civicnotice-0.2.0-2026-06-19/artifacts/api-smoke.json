@@ -1,0 +1,25 @@
+{
+  "git_head": "b4f2cedbdc6028ba5ce8f1d9f0b685f1ba0f60aa",
+  "root_status": 200,
+  "health_status": 200,
+  "public_ui_status": 200,
+  "openapi_status": 200,
+  "dependency_absent_status": 503,
+  "public_ui_buttons": 0,
+  "public_ui_textareas": 0,
+  "public_ui_docs_links": 1,
+  "public_ui_openapi_links": 1,
+  "rule_alias_status": 200,
+  "rule_alias_notice_type": "planning hearing",
+  "unknown_notice_type_status": 422,
+  "unknown_notice_type_supported_choices": [
+    "adoption notice",
+    "bid notice",
+    "general notice",
+    "hearing",
+    "planning hearing",
+    "public hearing",
+    "special meeting",
+    "vacancy notice"
+  ]
+}

@@ -1,0 +1,1344 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CivicNotice",
+    "description": "Public hearing, legal notice, bid notice, vacancy notice, and statutory publication deadline support for CivicSuite.",
+    "version": "0.2.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "description": "Return current product state without overstating unshipped behavior.",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Root  Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "description": "Return dependency/version health for deployment smoke checks.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/civicnotice": {
+      "get": {
+        "summary": "Public Civicnotice Page",
+        "description": "Return the public sample notice compliance support UI.",
+        "operationId": "public_civicnotice_page_civicnotice_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/registry": {
+      "post": {
+        "summary": "Notice Registry",
+        "operationId": "notice_registry_api_v1_civicnotice_registry_post",
+        "parameters": [
+          {
+            "name": "x-civicnotice-write-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Civicnotice-Write-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoticeRegistryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Notice Registry Api V1 Civicnotice Registry Post"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Durable CivicNotice write token is missing or invalid."
+          },
+          "503": {
+            "description": "CivicNotice workpaper persistence or durable write guard is not configured."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/registry/{record_id}": {
+      "get": {
+        "summary": "Get Notice Registry",
+        "operationId": "get_notice_registry_api_v1_civicnotice_registry__record_id__get",
+        "parameters": [
+          {
+            "name": "record_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Record Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Notice Registry Api V1 Civicnotice Registry  Record Id  Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Persisted CivicNotice workpaper record was not found."
+          },
+          "503": {
+            "description": "CivicNotice workpaper persistence is not configured."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/deadlines": {
+      "post": {
+        "summary": "Deadline Plan",
+        "operationId": "deadline_plan_api_v1_civicnotice_deadlines_post",
+        "parameters": [
+          {
+            "name": "x-civicnotice-write-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Civicnotice-Write-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeadlineRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Deadline Plan Api V1 Civicnotice Deadlines Post"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Durable CivicNotice write token is missing or invalid."
+          },
+          "503": {
+            "description": "CivicNotice workpaper persistence or durable write guard is not configured."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/deadlines/{plan_id}": {
+      "get": {
+        "summary": "Get Deadline Plan",
+        "operationId": "get_deadline_plan_api_v1_civicnotice_deadlines__plan_id__get",
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Plan Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Deadline Plan Api V1 Civicnotice Deadlines  Plan Id  Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Persisted CivicNotice workpaper record was not found."
+          },
+          "503": {
+            "description": "CivicNotice workpaper persistence is not configured."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/publication-proof": {
+      "post": {
+        "summary": "Publication Proof",
+        "operationId": "publication_proof_api_v1_civicnotice_publication_proof_post",
+        "parameters": [
+          {
+            "name": "x-civicnotice-write-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Civicnotice-Write-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicationProofRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Publication Proof Api V1 Civicnotice Publication Proof Post"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Durable CivicNotice write token is missing or invalid."
+          },
+          "503": {
+            "description": "CivicNotice workpaper persistence or durable write guard is not configured."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/publication-proof/{proof_id}": {
+      "get": {
+        "summary": "Get Publication Proof",
+        "operationId": "get_publication_proof_api_v1_civicnotice_publication_proof__proof_id__get",
+        "parameters": [
+          {
+            "name": "proof_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Proof Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Publication Proof Api V1 Civicnotice Publication Proof  Proof Id  Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Persisted CivicNotice workpaper record was not found."
+          },
+          "503": {
+            "description": "CivicNotice workpaper persistence is not configured."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/publication-check": {
+      "post": {
+        "summary": "Publication Checklist",
+        "operationId": "publication_checklist_api_v1_civicnotice_publication_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Publication Checklist Api V1 Civicnotice Publication Check Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/rule-check": {
+      "post": {
+        "summary": "Rule Check",
+        "operationId": "rule_check_api_v1_civicnotice_rule_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Rule Check Api V1 Civicnotice Rule Check Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/templates": {
+      "post": {
+        "summary": "Notice Template",
+        "operationId": "notice_template_api_v1_civicnotice_templates_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoticeTemplateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Notice Template Api V1 Civicnotice Templates Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/channels": {
+      "post": {
+        "summary": "Channel Plan",
+        "operationId": "channel_plan_api_v1_civicnotice_channels_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Channel Plan Api V1 Civicnotice Channels Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/subscribers/plan": {
+      "post": {
+        "summary": "Subscriber Delivery Plan",
+        "operationId": "subscriber_delivery_plan_api_v1_civicnotice_subscribers_plan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriberDeliveryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Subscriber Delivery Plan Api V1 Civicnotice Subscribers Plan Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/accessibility-review": {
+      "post": {
+        "summary": "Accessibility Review",
+        "operationId": "accessibility_review_api_v1_civicnotice_accessibility_review_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessibilityReviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Accessibility Review Api V1 Civicnotice Accessibility Review Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/archive-packet": {
+      "post": {
+        "summary": "Archive Packet",
+        "operationId": "archive_packet_api_v1_civicnotice_archive_packet_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArchivePacketRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Archive Packet Api V1 Civicnotice Archive Packet Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/civicnotice/export": {
+      "post": {
+        "summary": "Records Export",
+        "operationId": "records_export_api_v1_civicnotice_export_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordsExportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Records Export Api V1 Civicnotice Export Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccessibilityReviewRequest": {
+        "properties": {
+          "notice_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Id"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 240,
+            "title": "Title"
+          },
+          "notice_text": {
+            "type": "string",
+            "title": "Notice Text"
+          },
+          "target_languages": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Target Languages"
+          },
+          "attachments": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Attachments"
+          },
+          "has_contact": {
+            "type": "boolean",
+            "title": "Has Contact",
+            "default": false
+          },
+          "has_event_date": {
+            "type": "boolean",
+            "title": "Has Event Date",
+            "default": false
+          },
+          "has_plain_language_summary": {
+            "type": "boolean",
+            "title": "Has Plain Language Summary",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_id",
+          "title",
+          "notice_text"
+        ],
+        "title": "AccessibilityReviewRequest"
+      },
+      "ArchivePacketRequest": {
+        "properties": {
+          "notice_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Id"
+          },
+          "notice_type": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Type"
+          },
+          "source_module": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Source Module",
+            "default": "manual"
+          },
+          "source_record_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Source Record Id",
+            "default": ""
+          },
+          "registry_record_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Registry Record Id",
+            "default": ""
+          },
+          "deadline_plan_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Deadline Plan Id",
+            "default": ""
+          },
+          "publication_proof_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Publication Proof Id",
+            "default": ""
+          },
+          "rule_check_complete": {
+            "type": "boolean",
+            "title": "Rule Check Complete",
+            "default": false
+          },
+          "template_complete": {
+            "type": "boolean",
+            "title": "Template Complete",
+            "default": false
+          },
+          "accessibility_review_complete": {
+            "type": "boolean",
+            "title": "Accessibility Review Complete",
+            "default": false
+          },
+          "subscriber_delivery_complete": {
+            "type": "boolean",
+            "title": "Subscriber Delivery Complete",
+            "default": false
+          },
+          "records_export_complete": {
+            "type": "boolean",
+            "title": "Records Export Complete",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_id",
+          "notice_type"
+        ],
+        "title": "ArchivePacketRequest"
+      },
+      "ChannelRequest": {
+        "properties": {
+          "notice_type": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Type"
+          },
+          "audience": {
+            "type": "string",
+            "maxLength": 240,
+            "title": "Audience"
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_type",
+          "audience"
+        ],
+        "title": "ChannelRequest"
+      },
+      "DeadlineRequest": {
+        "properties": {
+          "notice_type": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Type"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Event Date"
+          },
+          "lead_days": {
+            "type": "integer",
+            "maximum": 366.0,
+            "minimum": 0.0,
+            "title": "Lead Days",
+            "default": 10
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_type",
+          "event_date"
+        ],
+        "title": "DeadlineRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "NoticeRegistryRequest": {
+        "properties": {
+          "notice_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Id"
+          },
+          "notice_type": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Type"
+          },
+          "owner": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Owner"
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_id",
+          "notice_type",
+          "owner"
+        ],
+        "title": "NoticeRegistryRequest"
+      },
+      "NoticeTemplateRequest": {
+        "properties": {
+          "notice_type": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Type",
+            "description": "Supported rule/template notice types include planning hearing, public hearing, bid notice, vacancy notice, adoption notice, special meeting, and general notice.",
+            "examples": [
+              "planning hearing",
+              "public hearing",
+              "bid notice"
+            ]
+          },
+          "matter_title": {
+            "type": "string",
+            "maxLength": 240,
+            "title": "Matter Title",
+            "examples": [
+              "Planning hearing"
+            ]
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Event Date",
+            "examples": [
+              "2026-08-01"
+            ]
+          },
+          "location": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Location",
+            "default": "",
+            "examples": [
+              "Council Chambers"
+            ]
+          },
+          "contact": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Contact",
+            "default": "",
+            "examples": [
+              "clerk@example.gov"
+            ]
+          },
+          "source_module": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Source Module",
+            "default": "manual",
+            "examples": [
+              "civicclerk"
+            ]
+          },
+          "statutory_basis": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Statutory Basis",
+            "default": "",
+            "examples": [
+              "staff-entered basis"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_type",
+          "matter_title",
+          "event_date"
+        ],
+        "title": "NoticeTemplateRequest"
+      },
+      "PublicationProofRequest": {
+        "properties": {
+          "notice_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Id"
+          },
+          "notice_type": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Type"
+          },
+          "source_module": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Source Module",
+            "default": "manual"
+          },
+          "source_record_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Source Record Id"
+          },
+          "channel": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Channel"
+          },
+          "published_at": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Published At"
+          },
+          "location": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Location"
+          },
+          "confirmation_reference": {
+            "type": "string",
+            "maxLength": 240,
+            "title": "Confirmation Reference"
+          },
+          "statutory_basis": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Statutory Basis"
+          },
+          "reviewer": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Reviewer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_id",
+          "notice_type",
+          "source_record_id",
+          "channel",
+          "published_at",
+          "location",
+          "confirmation_reference",
+          "statutory_basis",
+          "reviewer"
+        ],
+        "title": "PublicationProofRequest"
+      },
+      "PublicationRequest": {
+        "properties": {
+          "notice_type": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Type"
+          },
+          "channel": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Channel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_type",
+          "channel"
+        ],
+        "title": "PublicationRequest"
+      },
+      "RecordsExportRequest": {
+        "properties": {
+          "notice_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Id"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 240,
+            "title": "Title"
+          },
+          "format": {
+            "type": "string",
+            "maxLength": 40,
+            "title": "Format",
+            "default": "markdown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_id",
+          "title"
+        ],
+        "title": "RecordsExportRequest"
+      },
+      "RuleCheckRequest": {
+        "properties": {
+          "notice_type": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Type",
+            "description": "Supported rule/template notice types include planning hearing, public hearing, bid notice, vacancy notice, adoption notice, special meeting, and general notice.",
+            "examples": [
+              "planning hearing",
+              "public hearing",
+              "bid notice"
+            ]
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Event Date",
+            "description": "Hearing, bid, vacancy, adoption, special-meeting, or other event date.",
+            "examples": [
+              "2026-08-01"
+            ]
+          },
+          "publication_dates": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "type": "array",
+            "title": "Publication Dates",
+            "description": "Dates when the notice is scheduled or was published.",
+            "examples": [
+              [
+                "2026-07-17"
+              ]
+            ]
+          },
+          "channels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Channels",
+            "description": "Publication channels staff plans to use or has already used.",
+            "examples": [
+              [
+                "city website",
+                "posting board"
+              ]
+            ]
+          },
+          "content_fields": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Content Fields",
+            "description": "Notice fields present in the draft packet.",
+            "examples": [
+              [
+                "title",
+                "hearing date",
+                "location",
+                "case number",
+                "statutory basis"
+              ]
+            ]
+          },
+          "statutory_basis": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Statutory Basis",
+            "description": "Staff-entered statutory citation or authority for review.",
+            "default": "",
+            "examples": [
+              "staff-entered basis"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_type",
+          "event_date"
+        ],
+        "title": "RuleCheckRequest"
+      },
+      "SubscriberDeliveryRequest": {
+        "properties": {
+          "notice_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Id"
+          },
+          "notice_type": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Notice Type"
+          },
+          "audience": {
+            "type": "string",
+            "maxLength": 240,
+            "title": "Audience"
+          },
+          "subscribers": {
+            "items": {
+              "$ref": "#/components/schemas/SubscriberRequest"
+            },
+            "type": "array",
+            "title": "Subscribers"
+          },
+          "required_channels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Required Channels"
+          }
+        },
+        "type": "object",
+        "required": [
+          "notice_id",
+          "notice_type",
+          "audience"
+        ],
+        "title": "SubscriberDeliveryRequest"
+      },
+      "SubscriberRequest": {
+        "properties": {
+          "subscriber_id": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Subscriber Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "title": "Email",
+            "default": ""
+          },
+          "channels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "language": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Language",
+            "default": "English"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "subscriber_id",
+          "name"
+        ],
+        "title": "SubscriberRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

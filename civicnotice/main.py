@@ -45,6 +45,10 @@ PERSISTENCE_WRITE_RESPONSES = {
     403: {"description": "Durable CivicNotice write token is missing or invalid."},
     503: {"description": "CivicNotice workpaper persistence or durable write guard is not configured."},
 }
+SUPPORTED_NOTICE_TYPE_HELP = (
+    "Supported rule/template notice types include planning hearing, public hearing, bid notice, "
+    "vacancy notice, adoption notice, special meeting, and general notice."
+)
 
 
 class NoticeRegistryRequest(BaseModel):
@@ -65,22 +69,50 @@ class PublicationRequest(BaseModel):
 
 
 class RuleCheckRequest(BaseModel):
-    notice_type: str = Field(max_length=160)
-    event_date: date
-    publication_dates: list[date] = Field(default_factory=list)
-    channels: list[str] = Field(default_factory=list)
-    content_fields: list[str] = Field(default_factory=list)
-    statutory_basis: str = Field(default="", max_length=1000)
+    notice_type: str = Field(
+        max_length=160,
+        description=SUPPORTED_NOTICE_TYPE_HELP,
+        examples=["planning hearing", "public hearing", "bid notice"],
+    )
+    event_date: date = Field(
+        description="Hearing, bid, vacancy, adoption, special-meeting, or other event date.",
+        examples=["2026-08-01"],
+    )
+    publication_dates: list[date] = Field(
+        default_factory=list,
+        description="Dates when the notice is scheduled or was published.",
+        examples=[["2026-07-17"]],
+    )
+    channels: list[str] = Field(
+        default_factory=list,
+        description="Publication channels staff plans to use or has already used.",
+        examples=[["city website", "posting board"]],
+    )
+    content_fields: list[str] = Field(
+        default_factory=list,
+        description="Notice fields present in the draft packet.",
+        examples=[["title", "hearing date", "location", "case number", "statutory basis"]],
+    )
+    statutory_basis: str = Field(
+        default="",
+        max_length=1000,
+        description="Staff-entered statutory citation or authority for review.",
+        examples=["staff-entered basis"],
+    )
 
 
 class NoticeTemplateRequest(BaseModel):
-    notice_type: str = Field(max_length=160)
-    matter_title: str = Field(max_length=240)
-    event_date: date
-    location: str = Field(default="", max_length=1000)
-    contact: str = Field(default="", max_length=160)
-    source_module: str = Field(default="manual", max_length=160)
-    statutory_basis: str = Field(default="", max_length=1000)
+    notice_type: str = Field(
+        max_length=160,
+        description=SUPPORTED_NOTICE_TYPE_HELP,
+        examples=["planning hearing", "public hearing", "bid notice"],
+    )
+    matter_title: str = Field(max_length=240, examples=["Planning hearing"])
+    event_date: date = Field(examples=["2026-08-01"])
+    location: str = Field(default="", max_length=1000, examples=["Council Chambers"])
+    contact: str = Field(default="", max_length=160, examples=["clerk@example.gov"])
+    source_module: str = Field(default="manual", max_length=160, examples=["civicclerk"])
+    statutory_basis: str = Field(default="", max_length=1000, examples=["staff-entered basis"])
 
 
 class ChannelRequest(BaseModel):

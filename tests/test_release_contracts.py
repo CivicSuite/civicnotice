@@ -1,4 +1,6 @@
 from datetime import date, timedelta
+from pathlib import Path
+import tomllib
 
 from fastapi.testclient import TestClient
 
@@ -10,6 +12,17 @@ from civicnotice.subscriber_delivery import Subscriber, build_subscriber_deliver
 
 
 client = TestClient(app)
+
+
+def test_civiccore_dependency_declares_release_wheel_hash() -> None:
+    pyproject = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+    civiccore_dependency = next(
+        dependency
+        for dependency in pyproject["project"]["dependencies"]
+        if dependency.startswith("civiccore @ ")
+    )
+    assert "releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl" in civiccore_dependency
+    assert "#sha256=a94ce958e36fb03c8d961e4db4672ce5bcfa25765c57d75886e999cf15703ec7" in civiccore_dependency
 
 
 def test_openapi_documents_persistence_failure_contracts() -> None:
@@ -33,6 +46,16 @@ def test_openapi_documents_persistence_failure_contracts() -> None:
         responses = paths[path][method]["responses"]
         assert "403" in responses
         assert "503" in responses
+
+
+def test_openapi_guides_first_use_notice_type_values() -> None:
+    openapi = client.get("/openapi.json").json()
+    schemas = openapi["components"]["schemas"]
+    rule_notice = schemas["RuleCheckRequest"]["properties"]["notice_type"]
+    template_notice = schemas["NoticeTemplateRequest"]["properties"]["notice_type"]
+    assert "Supported rule/template notice types" in rule_notice["description"]
+    assert "planning hearing" in rule_notice["examples"]
+    assert "public hearing" in template_notice["examples"]
 
 
 def test_api_rejects_fields_longer_than_storage_contract() -> None:

@@ -1,0 +1,6 @@
+git_head=b4f2cedbdc6028ba5ce8f1d9f0b685f1ba0f60aa
+python=3.13.13
+platform=Windows-11-10.0.26200-SP0
+dependency_absent_no_db=registry GET returns actionable 503 when persistence is not configured
+postgres_release_gate=verify-release-postgres.log shows CIVICNOTICE_POSTGRES_TEST_URL visible and all tests passed with no skips
+public_ui_guidance=/civicnotice links to /docs and /openapi.json

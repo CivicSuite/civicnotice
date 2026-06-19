@@ -384,6 +384,9 @@ def test_public_ui_route_is_accessible_and_honest() -> None:
     assert "<button" not in text
     assert "<textarea" not in text
     assert 'class="sample-box"' in text
+    assert 'href="/docs"' in text
+    assert 'href="/openapi.json"' in text
+    assert "Supported rule-check and template notice types include planning hearing" in text
     assert "v0.2.0 notice compliance foundation" in text
     assert "does not determine legal sufficiency" in text
     assert "replace the notice system of record" in text

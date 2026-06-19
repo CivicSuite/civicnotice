@@ -1,0 +1,9 @@
+{
+  "status_code": 503,
+  "body": {
+    "detail": {
+      "message": "CivicNotice workpaper persistence is not configured.",
+      "fix": "Set CIVICNOTICE_WORKPAPER_DB_URL to retrieve persisted notice registry records."
+    }
+  }
+}

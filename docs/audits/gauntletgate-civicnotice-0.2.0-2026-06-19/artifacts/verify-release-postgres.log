@@ -1,0 +1,54 @@
+==> Version surface check
+PASS: version surfaces synchronized
+==> CivicCore wheel provenance
+PASS: CivicCore 1.2.0 wheel SHA-256 verified
+==> Test suite
+PASS: PostgreSQL test URL is visible to the selected Python interpreter
+....................................                                     [100%]
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.13.13-final-0 _______________
+
+Name                                  Stmts   Miss Branch BrPart  Cover
+-----------------------------------------------------------------------
+civicnotice\__init__.py                   1      0      0      0   100%
+civicnotice\accessibility_review.py      43      4     14      6    82%
+civicnotice\archive_packet.py            32      0      6      0   100%
+civicnotice\channel_plan.py              14      0      0      0   100%
+civicnotice\deadline_tracker.py          15      0      0      0   100%
+civicnotice\main.py                     235      4     28      4    97%
+civicnotice\notice_registry.py           13      0      0      0   100%
+civicnotice\notice_templates.py          24      0      0      0   100%
+civicnotice\persistence.py               96      1      8      1    98%
+civicnotice\public_ui.py                  3      0      0      0   100%
+civicnotice\publication_check.py         12      0      0      0   100%
+civicnotice\publication_proof.py         26      0      0      0   100%
+civicnotice\records_export.py            13      0      0      0   100%
+civicnotice\statutory_rules.py           62      0      6      0   100%
+civicnotice\subscriber_delivery.py       40      0      0      0   100%
+-----------------------------------------------------------------------
+TOTAL                                   629      9     62     11    97%
+Required test coverage of 90% reached. Total coverage: 97.11%
+36 passed in 3.50s
+==> Documentation gate
+==> Required-artifact check
+==> Current-facing shipped/planned truth check
+VERIFY-DOCS: PASSED
+==> Placeholder import gate
+PLACEHOLDER-IMPORT-CHECK: PASSED (15 source files scanned)
+==> Ruff
+All checks passed!
+==> Build artifacts
+* Creating isolated environment: venv+pip...
+* Installing packages in isolated environment:
+  - hatchling>=1.27.0
+* Getting build dependencies for sdist...
+* Building sdist...
+* Building wheel from sdist
+* Creating isolated environment: venv+pip...
+* Installing packages in isolated environment:
+  - hatchling>=1.27.0
+* Getting build dependencies for wheel...
+* Building wheel...
+Successfully built civicnotice-0.2.0.tar.gz and civicnotice-0.2.0-py3-none-any.whl
+PASS: build artifacts and SHA256SUMS.txt created
+VERIFY-RELEASE: PASSED
