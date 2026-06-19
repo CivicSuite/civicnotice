@@ -1,4 +1,4 @@
-"""Notice records export helpers for CivicNotice v0.1.2."""
+"""Notice records export helpers for CivicNotice v0.1.3."""
 
 from __future__ import annotations
 

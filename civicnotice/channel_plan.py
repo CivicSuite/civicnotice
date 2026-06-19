@@ -1,4 +1,4 @@
-"""Notice channel planning helpers for CivicNotice v0.1.2."""
+"""Notice channel planning helpers for CivicNotice v0.1.3."""
 
 from __future__ import annotations
 

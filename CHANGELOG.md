@@ -4,6 +4,14 @@ All notable changes to CivicNotice will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.3] - 2026-06-19
+
+### Changed
+
+- Moved CivicNotice to the `civiccore v1.2.0` release wheel used by the current Windows Local city-core platform.
+- Synchronized runtime health/version tests, docs, release gate version surfaces, and public UI copy for the v0.1.3 compatibility release.
+- Preserved the deterministic notice registry, deadline tracking, publication-readiness, channel-planning, records-export, optional workpaper persistence, and honest unshipped-boundary behavior from v0.1.2.
+
 ## [0.1.2] - 2026-04-29
 
 ### Changed
