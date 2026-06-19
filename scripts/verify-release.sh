@@ -2,6 +2,8 @@
 set -euo pipefail
 
 VERSION="0.2.0"
+CIVICCORE_WHEEL_URL="https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl"
+CIVICCORE_WHEEL_SHA256="a94ce958e36fb03c8d961e4db4672ce5bcfa25765c57d75886e999cf15703ec7"
 
 find_python() {
   local candidates=()
@@ -61,8 +63,26 @@ for path in [
 print("PASS: version surfaces synchronized")
 PY
 
+echo "==> CivicCore wheel provenance"
+${PYTHON_BIN} - <<PY
+from pathlib import Path
+from urllib.request import urlopen
+import hashlib
+import tempfile
+
+url = "${CIVICCORE_WHEEL_URL}"
+expected = "${CIVICCORE_WHEEL_SHA256}"
+with urlopen(url, timeout=30) as response:
+    data = response.read()
+actual = hashlib.sha256(data).hexdigest()
+assert actual == expected, actual
+path = Path(tempfile.gettempdir()) / "civiccore-1.2.0-py3-none-any.whl.sha256"
+path.write_text(f"{actual}  civiccore-1.2.0-py3-none-any.whl\\n", encoding="utf-8")
+print("PASS: CivicCore 1.2.0 wheel SHA-256 verified")
+PY
+
 echo "==> Test suite"
-${PYTHON_BIN} -m pytest -q
+${PYTHON_BIN} -m pytest -q --cov=civicnotice --cov-branch --cov-fail-under=90
 
 echo "==> Documentation gate"
 bash scripts/verify-docs.sh

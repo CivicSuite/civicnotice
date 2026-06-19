@@ -4,7 +4,7 @@ from datetime import date
 import os
 
 from civiccore import __version__ as CIVICCORE_VERSION
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
@@ -36,69 +36,77 @@ app = FastAPI(
 
 _workpaper_repository: NoticeWorkpaperRepository | None = None
 _workpaper_db_url: str | None = None
+PERSISTENCE_GET_RESPONSES = {
+    404: {"description": "Persisted CivicNotice workpaper record was not found."},
+    503: {"description": "CivicNotice workpaper persistence is not configured."},
+}
+PERSISTENCE_WRITE_RESPONSES = {
+    403: {"description": "Durable CivicNotice write token is missing or invalid."},
+    503: {"description": "CivicNotice workpaper persistence or durable write guard is not configured."},
+}
 
 
 class NoticeRegistryRequest(BaseModel):
-    notice_id: str
-    notice_type: str
-    owner: str
+    notice_id: str = Field(max_length=160)
+    notice_type: str = Field(max_length=160)
+    owner: str = Field(max_length=160)
 
 
 class DeadlineRequest(BaseModel):
-    notice_type: str
+    notice_type: str = Field(max_length=160)
     event_date: date
-    lead_days: int = 10
+    lead_days: int = Field(default=10, ge=0, le=366)
 
 
 class PublicationRequest(BaseModel):
-    notice_type: str
-    channel: str
+    notice_type: str = Field(max_length=160)
+    channel: str = Field(max_length=160)
 
 
 class RuleCheckRequest(BaseModel):
-    notice_type: str
+    notice_type: str = Field(max_length=160)
     event_date: date
     publication_dates: list[date] = Field(default_factory=list)
     channels: list[str] = Field(default_factory=list)
     content_fields: list[str] = Field(default_factory=list)
-    statutory_basis: str = ""
+    statutory_basis: str = Field(default="", max_length=1000)
 
 
 class NoticeTemplateRequest(BaseModel):
-    notice_type: str
-    matter_title: str
+    notice_type: str = Field(max_length=160)
+    matter_title: str = Field(max_length=240)
     event_date: date
-    location: str = ""
-    contact: str = ""
-    source_module: str = "manual"
-    statutory_basis: str = ""
+    location: str = Field(default="", max_length=1000)
+    contact: str = Field(default="", max_length=160)
+    source_module: str = Field(default="manual", max_length=160)
+    statutory_basis: str = Field(default="", max_length=1000)
 
 
 class ChannelRequest(BaseModel):
-    notice_type: str
-    audience: str
+    notice_type: str = Field(max_length=160)
+    audience: str = Field(max_length=240)
 
 
 class SubscriberRequest(BaseModel):
-    subscriber_id: str
-    name: str
-    email: str = ""
+    subscriber_id: str = Field(max_length=160)
+    name: str = Field(max_length=160)
+    email: str = Field(default="", max_length=254)
     channels: list[str] = Field(default_factory=list)
-    language: str = "English"
+    language: str = Field(default="English", max_length=80)
     active: bool = True
 
 
 class SubscriberDeliveryRequest(BaseModel):
-    notice_id: str
-    notice_type: str
-    audience: str
+    notice_id: str = Field(max_length=160)
+    notice_type: str = Field(max_length=160)
+    audience: str = Field(max_length=240)
     subscribers: list[SubscriberRequest] = Field(default_factory=list)
     required_channels: list[str] = Field(default_factory=lambda: ["email"])
 
 
 class AccessibilityReviewRequest(BaseModel):
-    notice_id: str
-    title: str
+    notice_id: str = Field(max_length=160)
+    title: str = Field(max_length=240)
     notice_text: str
     target_languages: list[str] = Field(default_factory=list)
     attachments: list[str] = Field(default_factory=list)
@@ -108,13 +116,13 @@ class AccessibilityReviewRequest(BaseModel):
 
 
 class ArchivePacketRequest(BaseModel):
-    notice_id: str
-    notice_type: str
-    source_module: str = "manual"
-    source_record_id: str = ""
-    registry_record_id: str = ""
-    deadline_plan_id: str = ""
-    publication_proof_id: str = ""
+    notice_id: str = Field(max_length=160)
+    notice_type: str = Field(max_length=160)
+    source_module: str = Field(default="manual", max_length=160)
+    source_record_id: str = Field(default="", max_length=160)
+    registry_record_id: str = Field(default="", max_length=160)
+    deadline_plan_id: str = Field(default="", max_length=160)
+    publication_proof_id: str = Field(default="", max_length=160)
     rule_check_complete: bool = False
     template_complete: bool = False
     accessibility_review_complete: bool = False
@@ -123,22 +131,22 @@ class ArchivePacketRequest(BaseModel):
 
 
 class RecordsExportRequest(BaseModel):
-    notice_id: str
-    title: str
-    format: str = "markdown"
+    notice_id: str = Field(max_length=160)
+    title: str = Field(max_length=240)
+    format: str = Field(default="markdown", max_length=40)
 
 
 class PublicationProofRequest(BaseModel):
-    notice_id: str
-    notice_type: str
-    source_module: str = "manual"
-    source_record_id: str
-    channel: str
-    published_at: str
-    location: str
-    confirmation_reference: str
-    statutory_basis: str
-    reviewer: str
+    notice_id: str = Field(max_length=160)
+    notice_type: str = Field(max_length=160)
+    source_module: str = Field(default="manual", max_length=160)
+    source_record_id: str = Field(max_length=160)
+    channel: str = Field(max_length=160)
+    published_at: str = Field(max_length=160)
+    location: str = Field(max_length=1000)
+    confirmation_reference: str = Field(max_length=240)
+    statutory_basis: str = Field(max_length=1000)
+    reviewer: str = Field(max_length=160)
 
 
 @app.get("/")
@@ -180,9 +188,13 @@ def public_civicnotice_page() -> str:
     return render_public_lookup_page()
 
 
-@app.post("/api/v1/civicnotice/registry")
-def notice_registry(request: NoticeRegistryRequest) -> dict[str, object]:
+@app.post("/api/v1/civicnotice/registry", responses=PERSISTENCE_WRITE_RESPONSES)
+def notice_registry(
+    request: NoticeRegistryRequest,
+    x_civicnotice_write_token: str | None = Header(default=None),
+) -> dict[str, object]:
     if _workpaper_database_url() is not None:
+        _authorize_persistent_write(x_civicnotice_write_token)
         return _stored_notice_response(
             _get_workpaper_repository().create_notice_record(
                 notice_id=request.notice_id,
@@ -199,7 +211,7 @@ def notice_registry(request: NoticeRegistryRequest) -> dict[str, object]:
     return payload
 
 
-@app.get("/api/v1/civicnotice/registry/{record_id}")
+@app.get("/api/v1/civicnotice/registry/{record_id}", responses=PERSISTENCE_GET_RESPONSES)
 def get_notice_registry(record_id: str) -> dict[str, object]:
     if _workpaper_database_url() is None:
         raise HTTPException(
@@ -221,9 +233,13 @@ def get_notice_registry(record_id: str) -> dict[str, object]:
     return _stored_notice_response(stored)
 
 
-@app.post("/api/v1/civicnotice/deadlines")
-def deadline_plan(request: DeadlineRequest) -> dict[str, object]:
+@app.post("/api/v1/civicnotice/deadlines", responses=PERSISTENCE_WRITE_RESPONSES)
+def deadline_plan(
+    request: DeadlineRequest,
+    x_civicnotice_write_token: str | None = Header(default=None),
+) -> dict[str, object]:
     if _workpaper_database_url() is not None:
+        _authorize_persistent_write(x_civicnotice_write_token)
         return _stored_deadline_response(
             _get_workpaper_repository().create_deadline_plan(
                 notice_type=request.notice_type,
@@ -240,7 +256,7 @@ def deadline_plan(request: DeadlineRequest) -> dict[str, object]:
     return payload
 
 
-@app.get("/api/v1/civicnotice/deadlines/{plan_id}")
+@app.get("/api/v1/civicnotice/deadlines/{plan_id}", responses=PERSISTENCE_GET_RESPONSES)
 def get_deadline_plan(plan_id: str) -> dict[str, object]:
     if _workpaper_database_url() is None:
         raise HTTPException(
@@ -262,8 +278,11 @@ def get_deadline_plan(plan_id: str) -> dict[str, object]:
     return _stored_deadline_response(stored)
 
 
-@app.post("/api/v1/civicnotice/publication-proof")
-def publication_proof(request: PublicationProofRequest) -> dict[str, object]:
+@app.post("/api/v1/civicnotice/publication-proof", responses=PERSISTENCE_WRITE_RESPONSES)
+def publication_proof(
+    request: PublicationProofRequest,
+    x_civicnotice_write_token: str | None = Header(default=None),
+) -> dict[str, object]:
     if _workpaper_database_url() is None:
         raise HTTPException(
             status_code=503,
@@ -272,6 +291,7 @@ def publication_proof(request: PublicationProofRequest) -> dict[str, object]:
                 "fix": "Set CIVICNOTICE_WORKPAPER_DB_URL to store durable publication proof records.",
             },
         )
+    _authorize_persistent_write(x_civicnotice_write_token)
     stored = _get_workpaper_repository().create_publication_proof(
         notice_id=request.notice_id,
         notice_type=request.notice_type,
@@ -287,7 +307,9 @@ def publication_proof(request: PublicationProofRequest) -> dict[str, object]:
     return _stored_publication_proof_response(stored)
 
 
-@app.get("/api/v1/civicnotice/publication-proof/{proof_id}")
+@app.get(
+    "/api/v1/civicnotice/publication-proof/{proof_id}", responses=PERSISTENCE_GET_RESPONSES
+)
 def get_publication_proof(proof_id: str) -> dict[str, object]:
     if _workpaper_database_url() is None:
         raise HTTPException(
@@ -421,6 +443,30 @@ def records_export(request: RecordsExportRequest) -> dict[str, object]:
 
 def _workpaper_database_url() -> str | None:
     return os.environ.get("CIVICNOTICE_WORKPAPER_DB_URL")
+
+
+def _trusted_write_token() -> str | None:
+    return os.environ.get("CIVICNOTICE_TRUSTED_WRITE_TOKEN")
+
+
+def _authorize_persistent_write(provided_token: str | None) -> None:
+    expected_token = _trusted_write_token()
+    if not expected_token:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "message": "CivicNotice durable write guard is not configured.",
+                "fix": "Set CIVICNOTICE_TRUSTED_WRITE_TOKEN before enabling persistence-backed writes.",
+            },
+        )
+    if provided_token != expected_token:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "message": "CivicNotice durable write token is missing or invalid.",
+                "fix": "Send the configured X-CivicNotice-Write-Token header for persistence-backed writes.",
+            },
+        )
 
 
 def _get_workpaper_repository() -> NoticeWorkpaperRepository:

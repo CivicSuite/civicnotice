@@ -10,7 +10,7 @@ Current state: `0.2.0` notice compliance foundation release, aligned to the `civ
 
 CivicNotice is a FastAPI Python package pinned to the `civiccore v1.2.0` release wheel. The current runtime exposes:
 
-Set `CIVICNOTICE_WORKPAPER_DB_URL` to enable SQLAlchemy-backed notice registry, deadline-plan, and publication-proof records. Leave it unset for deterministic stateless operation except durable publication-proof storage, which requires the database so proof packets can be retrieved later.
+Set `CIVICNOTICE_WORKPAPER_DB_URL` to enable SQLAlchemy-backed notice registry, deadline-plan, and publication-proof records. Leave it unset for deterministic stateless operation: registry and deadline POST requests return transient payloads, persisted GET routes return actionable 503 responses, and publication-proof storage is unavailable. When persistence is enabled, set `CIVICNOTICE_TRUSTED_WRITE_TOKEN` and send the matching `X-CivicNotice-Write-Token` header for durable write routes.
 
 - `GET /`
 - `GET /health`
@@ -29,6 +29,17 @@ Set `CIVICNOTICE_WORKPAPER_DB_URL` to enable SQLAlchemy-backed notice registry, 
 - `POST /api/v1/civicnotice/subscribers/plan`
 - `POST /api/v1/civicnotice/archive-packet`
 - `POST /api/v1/civicnotice/export`
+
+## Start and Smoke-Check CivicNotice
+
+A fresh user can reach the core stateless API and public sample UI without a database, model server, account, or API key. Start the ASGI app target `civicnotice.main:app`, then confirm `/health` reports CivicNotice `0.2.0` and CivicCore `1.2.0`.
+
+Minimal smoke-check workflow:
+
+1. Create a transient registry stub with `/api/v1/civicnotice/registry`.
+2. Create a deterministic rule check with `/api/v1/civicnotice/rule-check`.
+3. Open `/civicnotice` and confirm it is a static public sample with boundary copy.
+4. If durable workpapers are enabled, confirm the trusted write token is configured before testing persistence-backed writes.
 
 Run:
 

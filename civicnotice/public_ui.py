@@ -33,7 +33,7 @@ def render_public_lookup_page() -> str:
   p, li { line-height:1.65; overflow-wrap:anywhere; }
   textarea, button { width:100%; max-width:100%; min-width:0; border:1px solid #b9c6cc; border-radius:16px; padding:.85rem 1rem; font:inherit; }
   textarea { background:#f7f8fb; color:var(--ink); }
-  button { width:fit-content; min-width:190px; border:0; background:var(--blue); color:white; font-weight:900; cursor:default; }
+  .sample-box { width:100%; max-width:100%; min-width:0; border:1px solid #b9c6cc; border-radius:16px; padding:.85rem 1rem; background:#f7f8fb; color:var(--ink); }
   .result { margin-top:18px; padding:18px; border-left:6px solid var(--green); border-radius:18px; background:white; }
   .warning { border-left-color:#b2603f; background:#fff8f4; }
   .kicker { color:var(--muted); font-size:.86rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
@@ -55,8 +55,7 @@ def render_public_lookup_page() -> str:
     <article class="card large">
       <p class="kicker">Sample hearing notice</p>
       <h2 id="lookup-title">Planning hearing notice</h2>
-      <textarea aria-label="Sample notice notes" rows="4">Public hearing on rezoning request. Confirm statutory authority, publication lead time, accessibility needs, and proof of publication.</textarea>
-      <button type="button">Draft sample notice file</button>
+      <div class="sample-box" aria-label="Sample notice notes">Public hearing on rezoning request. Confirm statutory authority, publication lead time, accessibility needs, and proof of publication.</div>
       <div class="result" role="status" aria-live="polite">
         <h3>Staff review packet</h3>
         <ul><li>Confirm statutory authority, publication channel, lead time, and reviewer.</li><li>Route draft copy for clerk/legal review before publication.</li><li>Check accessibility, language access, subscriber delivery, proof, and archive handoff before closing the file.</li></ul>

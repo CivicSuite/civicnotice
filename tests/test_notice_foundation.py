@@ -354,6 +354,9 @@ def test_public_ui_route_is_accessible_and_honest() -> None:
     text = response.text
     assert '<a class="skip-link" href="#main">Skip to main content</a>' in text
     assert '<main id="main" tabindex="-1">' in text
+    assert "<button" not in text
+    assert "<textarea" not in text
+    assert 'class="sample-box"' in text
     assert "v0.2.0 notice compliance foundation" in text
     assert "does not determine legal sufficiency" in text
     assert "replace the notice system of record" in text

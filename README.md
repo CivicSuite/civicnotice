@@ -49,6 +49,23 @@ Current state: **v0.2.0 notice compliance foundation release**, aligned to the `
 - `POST /api/v1/civicnotice/archive-packet` returns archive and handoff readiness for a notice file.
 - `POST /api/v1/civicnotice/export` returns a notice and records export checklist.
 
+## Start and Smoke-Check CivicNotice
+
+Install the package with its development dependencies, start the ASGI app target `civicnotice.main:app`, and open the local `/health` and `/civicnotice` routes. A fresh user can reach the core stateless API and public sample UI without a database, model server, account, or API key.
+
+Minimal workflow to smoke-check after startup:
+
+1. Confirm `/health` reports `service: civicnotice`, version `0.2.0`, and CivicCore `1.2.0`.
+2. Post a registry stub to `/api/v1/civicnotice/registry` without a database and confirm the response includes `record_id: null`, registry notes, and the staff-responsibility disclaimer.
+3. Post a rule check to `/api/v1/civicnotice/rule-check` with a notice type, event date, publication dates, channels, content fields, and statutory basis.
+4. Open `/civicnotice` and confirm the page is a static public sample with boundary copy, not an official publication workflow.
+
+## Persistence and Durable Writes
+
+Without `CIVICNOTICE_WORKPAPER_DB_URL`, CivicNotice runs in deterministic stateless mode: registry and deadline POST requests return transient payloads, persisted GET routes return actionable 503 responses, and publication-proof storage is unavailable.
+
+With `CIVICNOTICE_WORKPAPER_DB_URL`, registry, deadline, and publication-proof workpapers are durable. Persistence-backed write routes also require `CIVICNOTICE_TRUSTED_WRITE_TOKEN` and the matching `X-CivicNotice-Write-Token` request header. This is a minimal trusted-mode guard for local deployments; it is not a replacement for a production identity system.
+
 ## Local Development
 
 ```bash

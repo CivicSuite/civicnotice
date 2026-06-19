@@ -48,21 +48,25 @@ def test_repository_persists_registry_and_deadline(tmp_path: Path) -> None:
 def test_notice_persistence_api_round_trip(monkeypatch, tmp_path: Path) -> None:
     db_path = tmp_path / "civicnotice-api.db"
     monkeypatch.setenv("CIVICNOTICE_WORKPAPER_DB_URL", f"sqlite+pysqlite:///{db_path.as_posix()}")
+    monkeypatch.setenv("CIVICNOTICE_TRUSTED_WRITE_TOKEN", "test-token")
     _dispose_workpaper_repository()
     created_record = client.post(
         "/api/v1/civicnotice/registry",
         json={"notice_id": "N-1", "notice_type": "hearing", "owner": "Clerk"},
+        headers={"X-CivicNotice-Write-Token": "test-token"},
     )
     record_id = created_record.json()["record_id"]
     fetched_record = client.get(f"/api/v1/civicnotice/registry/{record_id}")
     created_plan = client.post(
         "/api/v1/civicnotice/deadlines",
         json={"notice_type": "hearing", "event_date": "2026-05-20", "lead_days": 10},
+        headers={"X-CivicNotice-Write-Token": "test-token"},
     )
     plan_id = created_plan.json()["plan_id"]
     fetched_plan = client.get(f"/api/v1/civicnotice/deadlines/{plan_id}")
     _dispose_workpaper_repository()
     monkeypatch.delenv("CIVICNOTICE_WORKPAPER_DB_URL")
+    monkeypatch.delenv("CIVICNOTICE_TRUSTED_WRITE_TOKEN")
     assert fetched_record.status_code == 200
     assert fetched_record.json()["notice_id"] == "N-1"
     assert fetched_plan.status_code == 200
@@ -74,6 +78,7 @@ def test_notice_persistence_api_round_trip(monkeypatch, tmp_path: Path) -> None:
 def test_publication_proof_api_round_trip(monkeypatch, tmp_path: Path) -> None:
     db_path = tmp_path / "civicnotice-proof.db"
     monkeypatch.setenv("CIVICNOTICE_WORKPAPER_DB_URL", f"sqlite+pysqlite:///{db_path.as_posix()}")
+    monkeypatch.setenv("CIVICNOTICE_TRUSTED_WRITE_TOKEN", "test-token")
     _dispose_workpaper_repository()
     created_proof = client.post(
         "/api/v1/civicnotice/publication-proof",
@@ -89,11 +94,13 @@ def test_publication_proof_api_round_trip(monkeypatch, tmp_path: Path) -> None:
             "statutory_basis": "staff-entered hearing notice basis",
             "reviewer": "City Clerk",
         },
+        headers={"X-CivicNotice-Write-Token": "test-token"},
     )
     proof_id = created_proof.json()["proof_id"]
     fetched_proof = client.get(f"/api/v1/civicnotice/publication-proof/{proof_id}")
     _dispose_workpaper_repository()
     monkeypatch.delenv("CIVICNOTICE_WORKPAPER_DB_URL")
+    monkeypatch.delenv("CIVICNOTICE_TRUSTED_WRITE_TOKEN")
     assert fetched_proof.status_code == 200
     payload = fetched_proof.json()
     assert payload["notice_id"] == "N-2"
@@ -157,3 +164,46 @@ def test_publication_proof_without_persistence_returns_actionable_503(monkeypatc
     )
     assert response.status_code == 503
     assert "Set CIVICNOTICE_WORKPAPER_DB_URL" in response.json()["detail"]["fix"]
+
+
+def test_persistence_backed_write_requires_trusted_token(monkeypatch, tmp_path: Path) -> None:
+    db_path = tmp_path / "civicnotice-token.db"
+    monkeypatch.setenv("CIVICNOTICE_WORKPAPER_DB_URL", f"sqlite+pysqlite:///{db_path.as_posix()}")
+    monkeypatch.setenv("CIVICNOTICE_TRUSTED_WRITE_TOKEN", "test-token")
+    _dispose_workpaper_repository()
+    missing = client.post(
+        "/api/v1/civicnotice/registry",
+        json={"notice_id": "N-4", "notice_type": "hearing", "owner": "Clerk"},
+    )
+    wrong = client.post(
+        "/api/v1/civicnotice/registry",
+        json={"notice_id": "N-4", "notice_type": "hearing", "owner": "Clerk"},
+        headers={"X-CivicNotice-Write-Token": "wrong"},
+    )
+    _dispose_workpaper_repository()
+    monkeypatch.delenv("CIVICNOTICE_WORKPAPER_DB_URL")
+    monkeypatch.delenv("CIVICNOTICE_TRUSTED_WRITE_TOKEN")
+    assert missing.status_code == 403
+    assert wrong.status_code == 403
+    if db_path.exists():
+        db_path.unlink()
+
+
+def test_persistence_backed_write_requires_guard_configuration(
+    monkeypatch, tmp_path: Path
+) -> None:
+    db_path = tmp_path / "civicnotice-token-missing.db"
+    monkeypatch.setenv("CIVICNOTICE_WORKPAPER_DB_URL", f"sqlite+pysqlite:///{db_path.as_posix()}")
+    monkeypatch.delenv("CIVICNOTICE_TRUSTED_WRITE_TOKEN", raising=False)
+    _dispose_workpaper_repository()
+    response = client.post(
+        "/api/v1/civicnotice/deadlines",
+        json={"notice_type": "hearing", "event_date": "2026-05-20", "lead_days": 10},
+        headers={"X-CivicNotice-Write-Token": "test-token"},
+    )
+    _dispose_workpaper_repository()
+    monkeypatch.delenv("CIVICNOTICE_WORKPAPER_DB_URL")
+    assert response.status_code == 503
+    assert "CIVICNOTICE_TRUSTED_WRITE_TOKEN" in response.json()["detail"]["fix"]
+    if db_path.exists():
+        db_path.unlink()
