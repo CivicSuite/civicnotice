@@ -1,4 +1,4 @@
-"""Publication proof workpaper helpers for CivicNotice v0.1.3."""
+"""Publication proof workpaper helpers for CivicNotice v0.2.0."""
 
 from __future__ import annotations
 

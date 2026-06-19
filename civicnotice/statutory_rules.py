@@ -1,4 +1,4 @@
-"""Deterministic statutory notice rule checks for CivicNotice v0.1.3."""
+"""Deterministic statutory notice rule checks for CivicNotice v0.2.0."""
 
 from __future__ import annotations
 

@@ -157,7 +157,7 @@ def root() -> dict[str, str]:
             "advice, live LLM calls, publication-system write-back, and notice system-of-record integrations "
             "are not implemented yet."
         ),
-        "next_step": "Post-v0.1.3 roadmap: statutory rule packs, CivicClerk/CivicProcure/CivicNotice handoffs, and publication proof queues",
+        "next_step": "Post-v0.2.0 roadmap: jurisdiction-specific statutory rule packs, live CivicClerk/CivicProcure/CivicNotice handoffs, and publication proof queues",
     }
 
 

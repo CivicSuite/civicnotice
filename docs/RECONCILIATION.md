@@ -1,6 +1,6 @@
 # CivicNotice Reconciliation
 
-| Driver | CivicNotice v0.1.3 result |
+| Driver | CivicNotice v0.2.0 result |
 |---|---|
 | Unified spec CivicNotice catalog entry | notice registry, deadline tracking, deterministic statutory rule checks, notice drafting templates, publication readiness tracking, channel planning, and notice/records export checklists represented through deterministic helpers. |
 | Apache 2.0 code licensing | `LICENSE-CODE` and package metadata use Apache 2.0. |

@@ -1,4 +1,4 @@
-"""Static public UI shell for CivicNotice v0.1.3."""
+"""Static public UI shell for CivicNotice v0.2.0."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ def render_public_lookup_page() -> str:
   <p class="eyebrow">CivicSuite / CivicNotice public sample</p>
   <h1>Public notices with fewer missed deadlines.</h1>
   <p class="lede">CivicNotice demonstrates notice administration support: registry stubs, deadline plans, rule checks, templates, accessibility review, subscriber delivery planning, archive packets, and proof-preserving records exports without publishing official notice.</p>
-  <p><span class="badge">v0.1.3 notice compliance foundation</span></p>
+  <p><span class="badge">v0.2.0 notice compliance foundation</span></p>
 </header>
 <main id="main" tabindex="-1">
   <section class="grid" aria-labelledby="lookup-title">
