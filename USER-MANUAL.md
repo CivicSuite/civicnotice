@@ -2,7 +2,7 @@
 
 ## For Non-Technical Users
 
-CivicNotice helps city staff organize public hearing notices, legal notices, bid notices, vacancy notices, publication deadlines, channel planning notes, proof requirements, and export manifests. It can create a sample notice registry stub, build publication deadline reminders, retrieve saved registry/deadline workpapers when IT enables persistence, assemble publication-readiness checklists, summarize channel planning, and assemble a notice/records export checklist.
+CivicNotice helps city staff organize public hearing notices, legal notices, bid notices, vacancy notices, publication deadlines, channel planning notes, proof requirements, and export manifests. It can create a sample notice registry stub, build publication deadline reminders, retrieve saved registry/deadline/publication-proof workpapers when IT enables persistence, assemble publication-readiness checklists, summarize channel planning, and assemble a notice/records export checklist.
 
 Current state: `0.1.3` notice compliance foundation release, aligned to the `civiccore v1.2.0` release wheel. CivicNotice uses the shared CivicCore notice-deadline helper for deterministic reminder plans, but it still does not decide legal sufficiency, publish official notices, provide legal advice, call live LLMs, write back to publication systems, or update a notice system of record. Staff own every decision.
 
@@ -10,7 +10,7 @@ Current state: `0.1.3` notice compliance foundation release, aligned to the `civ
 
 CivicNotice is a FastAPI Python package pinned to the `civiccore v1.2.0` release wheel. The current runtime exposes:
 
-Set `CIVICNOTICE_WORKPAPER_DB_URL` to enable SQLAlchemy-backed notice registry and deadline-plan records. Leave it unset for deterministic stateless operation.
+Set `CIVICNOTICE_WORKPAPER_DB_URL` to enable SQLAlchemy-backed notice registry, deadline-plan, and publication-proof records. Leave it unset for deterministic stateless operation except durable publication-proof storage, which requires the database so proof packets can be retrieved later.
 
 - `GET /`
 - `GET /health`
@@ -19,6 +19,8 @@ Set `CIVICNOTICE_WORKPAPER_DB_URL` to enable SQLAlchemy-backed notice registry a
 - `GET /api/v1/civicnotice/registry/{record_id}`
 - `POST /api/v1/civicnotice/deadlines`
 - `GET /api/v1/civicnotice/deadlines/{plan_id}`
+- `POST /api/v1/civicnotice/publication-proof`
+- `GET /api/v1/civicnotice/publication-proof/{proof_id}`
 - `POST /api/v1/civicnotice/publication-check`
 - `POST /api/v1/civicnotice/channels`
 - `POST /api/v1/civicnotice/export`
@@ -42,4 +44,4 @@ flowchart LR
   CivicNotice --> Export["Notice and records export checklist"]
 ```
 
-CivicNotice depends on CivicCore. CivicCore does not depend on CivicNotice. CivicNotice v0.1.3 uses the shared CivicCore notice deadline helper plus deterministic sample notice data only; live agenda/procurement handoffs, legal sufficiency decisions, legal advice, official notice publication, publication-system write-back, and production notice-system integrations are future work.
+CivicNotice depends on CivicCore. CivicCore does not depend on CivicNotice. CivicNotice v0.1.3 uses the shared CivicCore notice deadline helper plus deterministic sample notice data and optional publication-proof workpapers only; live agenda/procurement handoffs, legal sufficiency decisions, legal advice, official notice publication, publication-system write-back, and production notice-system integrations are future work.

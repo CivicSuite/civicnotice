@@ -2,13 +2,14 @@
 
 CivicNotice is the CivicSuite module for public hearing notices, legal notices, bid notices, vacancy notices, statutory publication deadlines, publication-readiness review, channel planning, and notice-record export checklists.
 
-Current state: **v0.1.3 notice compliance foundation release**, aligned to the `civiccore v1.2.0` release wheel. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample notice registry, CivicCore-backed statutory deadline plans, optional database-backed registry/deadline workpapers, publication-readiness checklists, channel-planning helpers, notice/records export checklist, and accessible public sample UI at `/civicnotice`. It does **not** ship legal sufficiency decisions, legal advice, live LLM calls, official notice publication, publication-system write-back, or notice system-of-record integrations.
+Current state: **v0.1.3 notice compliance foundation release**, aligned to the `civiccore v1.2.0` release wheel. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample notice registry, CivicCore-backed statutory deadline plans, optional database-backed registry/deadline/publication-proof workpapers, publication-readiness checklists, channel-planning helpers, notice/records export checklist, and accessible public sample UI at `/civicnotice`. It does **not** ship legal sufficiency decisions, legal advice, live LLM calls, official notice publication, publication-system write-back, or notice system-of-record integrations.
 
 ## What CivicNotice Does
 
 - Create sample notice registry stubs.
 - Build statutory publication deadline reminder plans using the shared CivicCore notice helper.
-- Persist notice registry and deadline-plan workpapers when `CIVICNOTICE_WORKPAPER_DB_URL` is configured.
+- Persist notice registry, deadline-plan, and publication-proof workpapers when `CIVICNOTICE_WORKPAPER_DB_URL` is configured.
+- Store staff-reviewed publication proof packets linked to upstream Clerk, procurement, board, or manual source records.
 - Assemble publication-readiness checklists for staff review.
 - Plan notice channels and accessibility-review needs.
 - Produce notice and records export checklists.
@@ -32,6 +33,8 @@ Current state: **v0.1.3 notice compliance foundation release**, aligned to the `
 - `GET /api/v1/civicnotice/registry/{record_id}` retrieves a persisted notice registry record.
 - `POST /api/v1/civicnotice/deadlines` returns statutory deadline reminders.
 - `GET /api/v1/civicnotice/deadlines/{plan_id}` retrieves a persisted deadline plan.
+- `POST /api/v1/civicnotice/publication-proof` stores a durable publication proof workpaper.
+- `GET /api/v1/civicnotice/publication-proof/{proof_id}` retrieves a persisted publication proof workpaper.
 - `POST /api/v1/civicnotice/publication-check` returns a publication-readiness checklist.
 - `POST /api/v1/civicnotice/channels` returns channel planning flags.
 - `POST /api/v1/civicnotice/export` returns a notice and records export checklist.
