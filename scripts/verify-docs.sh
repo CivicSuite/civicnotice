@@ -30,6 +30,8 @@ required=(
   "civicnotice/main.py"
   "civicnotice/notice_registry.py"
   "civicnotice/deadline_tracker.py"
+  "civicnotice/statutory_rules.py"
+  "civicnotice/notice_templates.py"
   "civicnotice/publication_check.py"
   "civicnotice/channel_plan.py"
   "civicnotice/records_export.py"

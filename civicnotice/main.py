@@ -6,11 +6,12 @@ import os
 from civiccore import __version__ as CIVICCORE_VERSION
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from civicnotice import __version__
 from civicnotice.channel_plan import plan_notice_channels
 from civicnotice.deadline_tracker import build_deadline_plan
+from civicnotice.notice_templates import build_notice_template
 from civicnotice.notice_registry import register_notice_stub
 from civicnotice.persistence import (
     NoticeWorkpaperRepository,
@@ -21,6 +22,7 @@ from civicnotice.persistence import (
 from civicnotice.public_ui import render_public_lookup_page
 from civicnotice.publication_check import build_publication_checklist
 from civicnotice.records_export import build_notice_records_export
+from civicnotice.statutory_rules import check_statutory_notice_requirements
 
 
 app = FastAPI(
@@ -48,6 +50,25 @@ class DeadlineRequest(BaseModel):
 class PublicationRequest(BaseModel):
     notice_type: str
     channel: str
+
+
+class RuleCheckRequest(BaseModel):
+    notice_type: str
+    event_date: date
+    publication_dates: list[date] = Field(default_factory=list)
+    channels: list[str] = Field(default_factory=list)
+    content_fields: list[str] = Field(default_factory=list)
+    statutory_basis: str = ""
+
+
+class NoticeTemplateRequest(BaseModel):
+    notice_type: str
+    matter_title: str
+    event_date: date
+    location: str = ""
+    contact: str = ""
+    source_module: str = "manual"
+    statutory_basis: str = ""
 
 
 class ChannelRequest(BaseModel):
@@ -84,7 +105,7 @@ def root() -> dict[str, str]:
         "status": "notice compliance foundation",
         "message": (
             "CivicNotice package, API foundation, sample notice registry, CivicCore-backed deadline plans, "
-            "publication-readiness checklist, channel planning, records export checklist, optional "
+            "statutory rule checks, notice drafting templates, publication-readiness checklist, channel planning, records export checklist, optional "
             "database-backed registry/deadline/publication-proof workpapers, and public UI foundation are online; official "
             "legal sufficiency decisions, official publication, legal "
             "advice, live LLM calls, publication-system write-back, and notice system-of-record integrations "
@@ -248,6 +269,37 @@ def publication_checklist(request: PublicationRequest) -> dict[str, object]:
         notice_type=request.notice_type,
         channel=request.channel,
     ).__dict__
+
+
+@app.post("/api/v1/civicnotice/rule-check")
+def rule_check(request: RuleCheckRequest) -> dict[str, object]:
+    result = check_statutory_notice_requirements(
+        notice_type=request.notice_type,
+        event_date=request.event_date,
+        publication_dates=tuple(request.publication_dates),
+        channels=tuple(request.channels),
+        content_fields=tuple(request.content_fields),
+        statutory_basis=request.statutory_basis,
+    )
+    payload = result.__dict__.copy()
+    payload["event_date"] = result.event_date.isoformat()
+    payload["required_deadline_date"] = result.required_deadline_date.isoformat()
+    payload["publication_dates"] = [value.isoformat() for value in result.publication_dates]
+    return payload
+
+
+@app.post("/api/v1/civicnotice/templates")
+def notice_template(request: NoticeTemplateRequest) -> dict[str, object]:
+    result = build_notice_template(
+        notice_type=request.notice_type,
+        matter_title=request.matter_title,
+        event_date=request.event_date,
+        location=request.location,
+        contact=request.contact,
+        source_module=request.source_module,
+        statutory_basis=request.statutory_basis,
+    )
+    return result.__dict__
 
 
 @app.post("/api/v1/civicnotice/channels")

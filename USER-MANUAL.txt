@@ -4,7 +4,7 @@ CivicNotice User Manual
 For non-technical users
 -----------------------
 
-CivicNotice helps city staff organize public hearing notices, legal notices, bid notices, vacancy notices, publication deadlines, channel planning notes, proof requirements, and export manifests. It can create a sample notice registry stub, build publication deadline reminders, retrieve saved registry/deadline/publication-proof workpapers when IT enables persistence, assemble publication-readiness checklists, summarize channel planning, and assemble a notice/records export checklist.
+CivicNotice helps city staff organize public hearing notices, legal notices, bid notices, vacancy notices, publication deadlines, channel planning notes, proof requirements, and export manifests. It can create a sample notice registry stub, build publication deadline reminders, check a draft packet against deterministic staff-review rules, create a staff-editable notice template, retrieve saved registry/deadline/publication-proof workpapers when IT enables persistence, assemble publication-readiness checklists, summarize channel planning, and assemble a notice/records export checklist.
 
 Current state: 0.1.3 notice compliance foundation release, aligned to the civiccore v1.2.0 release wheel. CivicNotice uses the shared CivicCore notice deadline helper for deterministic reminder plans, but it does not decide legal sufficiency, publish official notices, provide legal advice, call live LLMs, write back to publication systems, or update a notice system of record. Staff own every decision.
 
@@ -22,6 +22,8 @@ Set CIVICNOTICE_WORKPAPER_DB_URL to enable SQLAlchemy-backed notice registry, de
 - GET /api/v1/civicnotice/registry/{record_id}
 - POST /api/v1/civicnotice/deadlines
 - GET /api/v1/civicnotice/deadlines/{plan_id}
+- POST /api/v1/civicnotice/rule-check
+- POST /api/v1/civicnotice/templates
 - POST /api/v1/civicnotice/publication-proof
 - GET /api/v1/civicnotice/publication-proof/{proof_id}
 - POST /api/v1/civicnotice/publication-check
@@ -41,4 +43,4 @@ Staff -> CivicNotice -> CivicCore v1.2.0
 CivicNotice future handoffs -> CivicClerk, CivicProcure, CivicBoards, CivicRecords AI
 CivicNotice -> Notice and records export checklist
 
-CivicNotice depends on CivicCore. CivicCore does not depend on CivicNotice. CivicNotice v0.1.3 uses the shared CivicCore notice deadline helper plus deterministic sample notice data and optional publication-proof workpapers only; live agenda/procurement handoffs, legal sufficiency decisions, legal advice, official notice publication, publication-system write-back, and production notice-system integrations are future work.
+CivicNotice depends on CivicCore. CivicCore does not depend on CivicNotice. CivicNotice v0.1.3 uses the shared CivicCore notice deadline helper plus deterministic sample notice data, staff-review rule packs, notice templates, and optional publication-proof workpapers only; live agenda/procurement handoffs, legal sufficiency decisions, legal advice, official notice publication, publication-system write-back, and production notice-system integrations are future work.

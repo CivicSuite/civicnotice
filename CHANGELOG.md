@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Moved CivicNotice to the `civiccore v1.2.0` release wheel used by the current Windows Local city-core platform.
 - Synchronized runtime health/version tests, docs, release gate version surfaces, and public UI copy for the v0.1.3 compatibility release.
 - Added durable publication-proof workpapers for staff evidence packets linked to Clerk, procurement, board, or manual source records.
+- Added deterministic statutory rule checks and staff-editable notice drafting templates for common notice types.
 - Preserved the deterministic notice registry, deadline tracking, publication-readiness, channel-planning, records-export, optional workpaper persistence, and honest unshipped-boundary behavior from v0.1.2.
 
 ## [0.1.2] - 2026-04-29
