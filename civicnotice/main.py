@@ -7,6 +7,7 @@ from civiccore import __version__ as CIVICCORE_VERSION
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
+from sqlalchemy.exc import SQLAlchemyError
 
 from civicnotice import __version__
 from civicnotice.accessibility_review import build_accessibility_review
@@ -24,7 +25,7 @@ from civicnotice.persistence import (
 from civicnotice.public_ui import render_public_lookup_page
 from civicnotice.publication_check import build_publication_checklist
 from civicnotice.records_export import build_notice_records_export
-from civicnotice.statutory_rules import check_statutory_notice_requirements
+from civicnotice.statutory_rules import check_statutory_notice_requirements, supported_notice_types
 from civicnotice.subscriber_delivery import Subscriber, build_subscriber_delivery_plan
 
 
@@ -195,11 +196,13 @@ def notice_registry(
 ) -> dict[str, object]:
     if _workpaper_database_url() is not None:
         _authorize_persistent_write(x_civicnotice_write_token)
-        return _stored_notice_response(
-            _get_workpaper_repository().create_notice_record(
-                notice_id=request.notice_id,
-                notice_type=request.notice_type,
-                owner=request.owner,
+        return _with_persistence_errors(
+            lambda: _stored_notice_response(
+                _get_workpaper_repository().create_notice_record(
+                    notice_id=request.notice_id,
+                    notice_type=request.notice_type,
+                    owner=request.owner,
+                )
             )
         )
     payload = register_notice_stub(
@@ -221,7 +224,7 @@ def get_notice_registry(record_id: str) -> dict[str, object]:
                 "fix": "Set CIVICNOTICE_WORKPAPER_DB_URL to retrieve persisted notice registry records.",
             },
         )
-    stored = _get_workpaper_repository().get_notice_record(record_id)
+    stored = _with_persistence_errors(lambda: _get_workpaper_repository().get_notice_record(record_id))
     if stored is None:
         raise HTTPException(
             status_code=404,
@@ -240,11 +243,13 @@ def deadline_plan(
 ) -> dict[str, object]:
     if _workpaper_database_url() is not None:
         _authorize_persistent_write(x_civicnotice_write_token)
-        return _stored_deadline_response(
-            _get_workpaper_repository().create_deadline_plan(
-                notice_type=request.notice_type,
-                event_date=request.event_date,
-                lead_days=request.lead_days,
+        return _with_persistence_errors(
+            lambda: _stored_deadline_response(
+                _get_workpaper_repository().create_deadline_plan(
+                    notice_type=request.notice_type,
+                    event_date=request.event_date,
+                    lead_days=request.lead_days,
+                )
             )
         )
     payload = build_deadline_plan(
@@ -266,7 +271,7 @@ def get_deadline_plan(plan_id: str) -> dict[str, object]:
                 "fix": "Set CIVICNOTICE_WORKPAPER_DB_URL to retrieve persisted deadline plans.",
             },
         )
-    stored = _get_workpaper_repository().get_deadline_plan(plan_id)
+    stored = _with_persistence_errors(lambda: _get_workpaper_repository().get_deadline_plan(plan_id))
     if stored is None:
         raise HTTPException(
             status_code=404,
@@ -292,17 +297,19 @@ def publication_proof(
             },
         )
     _authorize_persistent_write(x_civicnotice_write_token)
-    stored = _get_workpaper_repository().create_publication_proof(
-        notice_id=request.notice_id,
-        notice_type=request.notice_type,
-        source_module=request.source_module,
-        source_record_id=request.source_record_id,
-        channel=request.channel,
-        published_at=request.published_at,
-        location=request.location,
-        confirmation_reference=request.confirmation_reference,
-        statutory_basis=request.statutory_basis,
-        reviewer=request.reviewer,
+    stored = _with_persistence_errors(
+        lambda: _get_workpaper_repository().create_publication_proof(
+            notice_id=request.notice_id,
+            notice_type=request.notice_type,
+            source_module=request.source_module,
+            source_record_id=request.source_record_id,
+            channel=request.channel,
+            published_at=request.published_at,
+            location=request.location,
+            confirmation_reference=request.confirmation_reference,
+            statutory_basis=request.statutory_basis,
+            reviewer=request.reviewer,
+        )
     )
     return _stored_publication_proof_response(stored)
 
@@ -319,7 +326,9 @@ def get_publication_proof(proof_id: str) -> dict[str, object]:
                 "fix": "Set CIVICNOTICE_WORKPAPER_DB_URL to retrieve persisted publication proof records.",
             },
         )
-    stored = _get_workpaper_repository().get_publication_proof(proof_id)
+    stored = _with_persistence_errors(
+        lambda: _get_workpaper_repository().get_publication_proof(proof_id)
+    )
     if stored is None:
         raise HTTPException(
             status_code=404,
@@ -341,14 +350,17 @@ def publication_checklist(request: PublicationRequest) -> dict[str, object]:
 
 @app.post("/api/v1/civicnotice/rule-check")
 def rule_check(request: RuleCheckRequest) -> dict[str, object]:
-    result = check_statutory_notice_requirements(
-        notice_type=request.notice_type,
-        event_date=request.event_date,
-        publication_dates=tuple(request.publication_dates),
-        channels=tuple(request.channels),
-        content_fields=tuple(request.content_fields),
-        statutory_basis=request.statutory_basis,
-    )
+    try:
+        result = check_statutory_notice_requirements(
+            notice_type=request.notice_type,
+            event_date=request.event_date,
+            publication_dates=tuple(request.publication_dates),
+            channels=tuple(request.channels),
+            content_fields=tuple(request.content_fields),
+            statutory_basis=request.statutory_basis,
+        )
+    except ValueError as exc:
+        raise _unsupported_notice_type_error(str(exc)) from exc
     payload = result.__dict__.copy()
     payload["event_date"] = result.event_date.isoformat()
     payload["required_deadline_date"] = result.required_deadline_date.isoformat()
@@ -358,15 +370,18 @@ def rule_check(request: RuleCheckRequest) -> dict[str, object]:
 
 @app.post("/api/v1/civicnotice/templates")
 def notice_template(request: NoticeTemplateRequest) -> dict[str, object]:
-    result = build_notice_template(
-        notice_type=request.notice_type,
-        matter_title=request.matter_title,
-        event_date=request.event_date,
-        location=request.location,
-        contact=request.contact,
-        source_module=request.source_module,
-        statutory_basis=request.statutory_basis,
-    )
+    try:
+        result = build_notice_template(
+            notice_type=request.notice_type,
+            matter_title=request.matter_title,
+            event_date=request.event_date,
+            location=request.location,
+            contact=request.contact,
+            source_module=request.source_module,
+            statutory_basis=request.statutory_basis,
+        )
+    except ValueError as exc:
+        raise _unsupported_notice_type_error(str(exc)) from exc
     return result.__dict__
 
 
@@ -479,6 +494,30 @@ def _get_workpaper_repository() -> NoticeWorkpaperRepository:
         _workpaper_db_url = db_url
         _workpaper_repository = NoticeWorkpaperRepository(db_url=db_url)
     return _workpaper_repository
+
+
+def _with_persistence_errors(operation):
+    try:
+        return operation()
+    except SQLAlchemyError as exc:
+        _dispose_workpaper_repository()
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "message": "CivicNotice workpaper persistence is configured but unavailable.",
+                "fix": "Verify CIVICNOTICE_WORKPAPER_DB_URL, database reachability, credentials, and schema permissions.",
+            },
+        ) from exc
+
+
+def _unsupported_notice_type_error(message: str) -> HTTPException:
+    return HTTPException(
+        status_code=422,
+        detail={
+            "message": message,
+            "supported_notice_types": list(supported_notice_types()),
+        },
+    )
 
 
 def _dispose_workpaper_repository() -> None:

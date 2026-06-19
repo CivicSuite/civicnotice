@@ -207,3 +207,26 @@ def test_persistence_backed_write_requires_guard_configuration(
     assert "CIVICNOTICE_TRUSTED_WRITE_TOKEN" in response.json()["detail"]["fix"]
     if db_path.exists():
         db_path.unlink()
+
+
+def test_configured_but_unavailable_persistence_returns_actionable_503(
+    monkeypatch, tmp_path: Path
+) -> None:
+    missing_parent = tmp_path / "missing-parent" / "civicnotice.db"
+    monkeypatch.setenv(
+        "CIVICNOTICE_WORKPAPER_DB_URL",
+        f"sqlite+pysqlite:///{missing_parent.as_posix()}",
+    )
+    monkeypatch.setenv("CIVICNOTICE_TRUSTED_WRITE_TOKEN", "test-token")
+    _dispose_workpaper_repository()
+    response = client.post(
+        "/api/v1/civicnotice/registry",
+        json={"notice_id": "N-5", "notice_type": "hearing", "owner": "Clerk"},
+        headers={"X-CivicNotice-Write-Token": "test-token"},
+    )
+    _dispose_workpaper_repository()
+    monkeypatch.delenv("CIVICNOTICE_WORKPAPER_DB_URL")
+    monkeypatch.delenv("CIVICNOTICE_TRUSTED_WRITE_TOKEN")
+    assert response.status_code == 503
+    assert "configured but unavailable" in response.json()["detail"]["message"]
+    assert "database reachability" in response.json()["detail"]["fix"]

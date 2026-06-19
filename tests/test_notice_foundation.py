@@ -85,24 +85,51 @@ def test_notice_template_preserves_staff_review_placeholders() -> None:
     assert "Staff must verify required publication channels" in result.template_lines[-1]
 
 
-def test_unknown_notice_type_uses_generic_staff_review_rule() -> None:
+def test_notice_type_aliases_resolve_without_generic_downgrade() -> None:
     rule_check = check_statutory_notice_requirements(
-        notice_type="river festival notice",
+        notice_type="public_hearing",
         event_date=date(2026, 8, 1),
-        content_fields=("title",),
+        content_fields=("title", "hearing date", "location", "case number", "statutory basis"),
+        channels=("city website", "posting board"),
+        statutory_basis="staff-entered basis",
     )
     template = build_notice_template(
-        notice_type="river festival notice",
-        matter_title="River festival street closure",
+        notice_type="public-hearing",
+        matter_title="Planning hearing",
         event_date=date(2026, 8, 1),
-        location="Main Street",
+        location="Council Chambers",
         contact="clerk@example.gov",
     )
-    assert rule_check.notice_type == "general notice"
-    assert "statutory basis" in rule_check.missing_content
+    assert rule_check.notice_type == "planning hearing"
+    assert "case number" not in rule_check.missing_content
     assert rule_check.staff_review_required is True
-    assert template.notice_type == "general notice"
-    assert "event date" in template.required_fields
+    assert template.notice_type == "planning hearing"
+    assert "case number" in template.required_fields
+
+
+def test_unknown_notice_type_is_rejected_with_supported_choices() -> None:
+    response = client.post(
+        "/api/v1/civicnotice/rule-check",
+        json={
+            "notice_type": "river festival notice",
+            "event_date": "2026-08-01",
+            "content_fields": ["title"],
+        },
+    )
+    template = client.post(
+        "/api/v1/civicnotice/templates",
+        json={
+            "notice_type": "river festival notice",
+            "matter_title": "River festival street closure",
+            "event_date": "2026-08-01",
+            "location": "Main Street",
+            "contact": "clerk@example.gov",
+        },
+    )
+    assert response.status_code == 422
+    assert template.status_code == 422
+    assert "Supported notice types" in response.json()["detail"]["message"]
+    assert "planning hearing" in response.json()["detail"]["supported_notice_types"]
 
 
 def test_channel_plan_flags_accessibility_review() -> None:

@@ -15,6 +15,8 @@ Set `CIVICNOTICE_WORKPAPER_DB_URL` to enable SQLAlchemy-backed notice registry, 
 - `GET /`
 - `GET /health`
 - `GET /civicnotice`
+- `GET /docs`
+- `GET /openapi.json`
 - `POST /api/v1/civicnotice/registry`
 - `GET /api/v1/civicnotice/registry/{record_id}`
 - `POST /api/v1/civicnotice/deadlines`
@@ -37,7 +39,7 @@ A fresh user can reach the core stateless API and public sample UI without a dat
 Minimal smoke-check workflow:
 
 1. Create a transient registry stub with `/api/v1/civicnotice/registry`.
-2. Create a deterministic rule check with `/api/v1/civicnotice/rule-check`.
+2. Open `/docs` or `/openapi.json` to inspect accepted fields, then create a deterministic rule check with `/api/v1/civicnotice/rule-check`. Unsupported notice types return supported choices instead of silently falling back to a generic rule.
 3. Open `/civicnotice` and confirm it is a static public sample with boundary copy.
 4. If durable workpapers are enabled, confirm the trusted write token is configured before testing persistence-backed writes.
 

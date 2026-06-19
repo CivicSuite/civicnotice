@@ -34,6 +34,8 @@ Current state: **v0.2.0 notice compliance foundation release**, aligned to the `
 - `GET /` returns the shipped/planned boundary.
 - `GET /health` returns package and CivicCore versions.
 - `GET /civicnotice` returns the accessible public sample UI.
+- `GET /docs` opens the interactive FastAPI API documentation for local deployments.
+- `GET /openapi.json` returns the machine-readable API schema, including accepted request and error shapes.
 - `POST /api/v1/civicnotice/registry` returns a sample notice registry stub.
 - `GET /api/v1/civicnotice/registry/{record_id}` retrieves a persisted notice registry record.
 - `POST /api/v1/civicnotice/deadlines` returns statutory deadline reminders.
@@ -57,7 +59,7 @@ Minimal workflow to smoke-check after startup:
 
 1. Confirm `/health` reports `service: civicnotice`, version `0.2.0`, and CivicCore `1.2.0`.
 2. Post a registry stub to `/api/v1/civicnotice/registry` without a database and confirm the response includes `record_id: null`, registry notes, and the staff-responsibility disclaimer.
-3. Post a rule check to `/api/v1/civicnotice/rule-check` with a notice type, event date, publication dates, channels, content fields, and statutory basis.
+3. Open `/docs` or `/openapi.json` to inspect accepted fields, then post a rule check to `/api/v1/civicnotice/rule-check` with a supported notice type, event date, publication dates, channels, content fields, and statutory basis. Unsupported notice types return a 422 response with supported choices.
 4. Open `/civicnotice` and confirm the page is a static public sample with boundary copy, not an official publication workflow.
 
 ## Persistence and Durable Writes
@@ -73,6 +75,8 @@ python -m pip install -e ".[dev]"
 python -m pytest -q
 bash scripts/verify-release.sh
 ```
+
+The release gate requires `CIVICNOTICE_POSTGRES_TEST_URL` so PostgreSQL persistence coverage cannot be skipped. Plain unit tests may still run without PostgreSQL for local development.
 
 ## License
 

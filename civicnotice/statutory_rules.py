@@ -83,6 +83,11 @@ RULE_PACKS: dict[str, NoticeRule] = {
     ),
 }
 
+NOTICE_TYPE_ALIASES: dict[str, str] = {
+    "public hearing": "planning hearing",
+    "hearing": "planning hearing",
+}
+
 
 def check_statutory_notice_requirements(
     *,
@@ -95,7 +100,7 @@ def check_statutory_notice_requirements(
 ) -> StatutoryRuleCheck:
     """Check a notice packet against deterministic staff-review rules."""
 
-    rule = _rule_for(notice_type)
+    rule = resolve_notice_rule(notice_type)
     normalized_channels = tuple(_clean(value) for value in channels if _clean(value))
     normalized_content = tuple(_clean(value) for value in content_fields if _clean(value))
     required_deadline = event_date - timedelta(days=rule.minimum_lead_days)
@@ -140,9 +145,21 @@ def check_statutory_notice_requirements(
     )
 
 
-def _rule_for(notice_type: str) -> NoticeRule:
+def supported_notice_types() -> tuple[str, ...]:
+    """Return user-facing notice type values accepted by rule checks."""
+
+    return tuple(sorted((*RULE_PACKS.keys(), *NOTICE_TYPE_ALIASES.keys())))
+
+
+def resolve_notice_rule(notice_type: str) -> NoticeRule:
+    """Return the matching rule or raise a helpful error for unsupported input."""
+
     normalized = _clean(notice_type)
-    return RULE_PACKS.get(normalized, RULE_PACKS["general notice"])
+    canonical = NOTICE_TYPE_ALIASES.get(normalized, normalized)
+    if canonical not in RULE_PACKS:
+        valid_types = ", ".join(supported_notice_types())
+        raise ValueError(f"Unsupported notice type '{notice_type}'. Supported notice types: {valid_types}.")
+    return RULE_PACKS[canonical]
 
 
 def _deadline_status(*, publication_dates: tuple[date, ...], required_deadline: date) -> str:
@@ -155,4 +172,5 @@ def _deadline_status(*, publication_dates: tuple[date, ...], required_deadline: 
 
 
 def _clean(value: str) -> str:
-    return " ".join(value.strip().lower().split())
+    normalized = value.replace("_", " ").replace("-", " ")
+    return " ".join(normalized.strip().lower().split())

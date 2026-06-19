@@ -26,6 +26,8 @@ API surface:
 - GET /
 - GET /health
 - GET /civicnotice
+- GET /docs
+- GET /openapi.json
 - POST /api/v1/civicnotice/registry
 - GET /api/v1/civicnotice/registry/{record_id}
 - POST /api/v1/civicnotice/deadlines
@@ -48,7 +50,7 @@ Install the package with development dependencies, start the ASGI app target civ
 Minimal smoke check:
 1. Confirm /health reports service civicnotice, version 0.2.0, and CivicCore 1.2.0.
 2. Post a registry stub to /api/v1/civicnotice/registry without a database and confirm record_id is null with registry notes and the staff-responsibility disclaimer.
-3. Post a rule check to /api/v1/civicnotice/rule-check with a notice type, event date, publication dates, channels, content fields, and statutory basis.
+3. Open /docs or /openapi.json to inspect accepted fields, then post a rule check to /api/v1/civicnotice/rule-check with a supported notice type, event date, publication dates, channels, content fields, and statutory basis. Unsupported notice types return a 422 response with supported choices.
 4. Open /civicnotice and confirm the page is a static public sample with boundary copy, not an official publication workflow.
 
 Persistence and durable writes:
@@ -56,5 +58,9 @@ Persistence and durable writes:
 Without CIVICNOTICE_WORKPAPER_DB_URL, CivicNotice runs in deterministic stateless mode: registry and deadline POST requests return transient payloads, persisted GET routes return actionable 503 responses, and publication-proof storage is unavailable.
 
 With CIVICNOTICE_WORKPAPER_DB_URL, registry, deadline, and publication-proof workpapers are durable. Persistence-backed write routes also require CIVICNOTICE_TRUSTED_WRITE_TOKEN and the matching X-CivicNotice-Write-Token request header. This is a minimal trusted-mode guard for local deployments; it is not a replacement for a production identity system.
+
+Release gate:
+
+The full release gate requires CIVICNOTICE_POSTGRES_TEST_URL so PostgreSQL persistence coverage cannot be skipped. Plain unit tests may still run without PostgreSQL for local development.
 
 License: Apache License 2.0 for code; CC BY 4.0 for documentation.

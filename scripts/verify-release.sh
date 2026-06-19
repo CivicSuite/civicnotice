@@ -82,6 +82,17 @@ print("PASS: CivicCore 1.2.0 wheel SHA-256 verified")
 PY
 
 echo "==> Test suite"
+if [[ -z "${CIVICNOTICE_POSTGRES_TEST_URL:-}" ]]; then
+  echo "FAIL: CIVICNOTICE_POSTGRES_TEST_URL is required for the release gate so PostgreSQL persistence coverage cannot be skipped." >&2
+  exit 1
+fi
+${PYTHON_BIN} - <<'PY'
+import os
+assert os.environ.get("CIVICNOTICE_POSTGRES_TEST_URL"), (
+    "CIVICNOTICE_POSTGRES_TEST_URL is not visible to the selected Python interpreter."
+)
+print("PASS: PostgreSQL test URL is visible to the selected Python interpreter")
+PY
 ${PYTHON_BIN} -m pytest -q --cov=civicnotice --cov-branch --cov-fail-under=90
 
 echo "==> Documentation gate"

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from civicnotice.notice_registry import DISCLAIMER
-from civicnotice.statutory_rules import RULE_PACKS
+from civicnotice.statutory_rules import resolve_notice_rule
 
 
 @dataclass(frozen=True)
@@ -33,7 +33,7 @@ def build_notice_template(
 ) -> NoticeTemplate:
     """Build a staff-editable notice template without declaring it legally sufficient."""
 
-    rule = RULE_PACKS.get(_clean(notice_type), RULE_PACKS["general notice"])
+    rule = resolve_notice_rule(notice_type)
     clean_title = matter_title.strip() or "Untitled notice matter"
     clean_location = location.strip() or "[staff must enter location]"
     clean_contact = contact.strip() or "[staff must enter contact]"
@@ -61,7 +61,3 @@ def build_notice_template(
         placeholders_remaining=placeholders,
         staff_review_required=True,
     )
-
-
-def _clean(value: str) -> str:
-    return " ".join(value.strip().lower().split())
