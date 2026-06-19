@@ -1,5 +1,4 @@
 {
-  "git_head": "028a5954068d7423a1e1b6234723ddff5188908a",
   "root_status": 200,
   "health_status": 200,
   "public_ui_status": 200,
@@ -21,5 +20,7 @@
     "public hearing",
     "special meeting",
     "vacancy notice"
-  ]
+  ],
+  "final_pushed_pr_head": "0ed06639a8f2c746337b6568586f73ca21b4111a",
+  "product_runtime_evidence_head": "028a5954068d7423a1e1b6234723ddff5188908a"
 }

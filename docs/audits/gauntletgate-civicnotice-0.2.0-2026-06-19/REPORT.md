@@ -4,11 +4,15 @@ Date: 2026-06-19
 
 Reviewed release: CivicNotice 0.2.0
 
-Final reviewed commit: 028a5954b4a7cc119a5b46e219f47e2101aa328c
+Final pushed PR head reviewed by CI: 0ed06639a8f2c746337b6568586f73ca21b4111a
+
+Product/runtime evidence source commit: 028a5954068d7423a1e1b6234723ddff5188908a
+
+Report metadata note: report-only commits may follow the product/runtime evidence commit. GitHub CI on the final pushed PR head is the source of truth that those metadata commits did not break the release gate.
 
 ## Verdict
 
-Pending final CI confirmation for commit 028a5954b4a7cc119a5b46e219f47e2101aa328c.
+Gate passed for the reviewed product/runtime evidence, and GitHub CI is green for pushed PR head 0ed06639a8f2c746337b6568586f73ca21b4111a.
 
 ## Gate Scope
 
