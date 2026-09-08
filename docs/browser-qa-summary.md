@@ -13,6 +13,6 @@ Checked at: 2026-04-27T22:25:26.910Z
 | runtime desktop | 1440x1000 | 0 | no | yes | yes | docs/browser-qa-civicnotice-desktop.png |
 | runtime mobile | 390x900 | 0 | no | yes | yes | docs/browser-qa-civicnotice-mobile.png |
 
-Repository URL verified in docs/index.html: https://github.com/CivicSuite/civicnotice
+Repository URL verified in docs/index.html: https://github.com/townlight/notice
 Runtime UI verified at http://127.0.0.1:8134/civicnotice.
 Current-facing copy does not claim legal sufficiency, official publication, legal advice, live LLM calls, publication-system write-back, or notice system-of-record authority.
