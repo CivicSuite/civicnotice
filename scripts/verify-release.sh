@@ -2,7 +2,7 @@
 set -euo pipefail
 
 VERSION="0.2.0"
-CIVICCORE_WHEEL_URL="https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl"
+CIVICCORE_WHEEL_URL="https://github.com/townlight/core/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl"
 CIVICCORE_WHEEL_SHA256="a94ce958e36fb03c8d961e4db4672ce5bcfa25765c57d75886e999cf15703ec7"
 
 find_python() {
